@@ -1,235 +1,84 @@
-/**
- * Building Sustainability Framework - Charts Module
- * Handles all data visualizations (Bar, Pie, Line, Table)
- */
+/* ========================================
+   BUILDING SUSTAINABILITY FRAMEWORK
+   Charts Module - 6 Scenarios Visualization
+   ======================================== */
 
-const ChartsModule = {
-    // Chart instances
-    barChart: null,
-    pieChart: null,
-    lineChart: null,
+const ChartsModule = (function() {
+    let barChart, pieChart, lineChart;
+    let resultsData = null;
 
-    // Chart color palette
-    colors: {
-        renovation: {
-            primary: '#047857',
-            light: '#10b981',
-            dark: '#065f46'
-        },
-        newbuild: {
-            primary: '#dc2626',
-            light: '#ef4444',
-            dark: '#991b1b'
-        },
-        embodied: '#f59e0b',
-        operational: '#3b82f6'
-    },
+    // Chart.js default config
+    Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    Chart.defaults.color = '#64748b';
 
-    /**
-     * Initialize all charts with calculation results
-     * @param {Object} results - Calculation results from calculator.js
-     */
-    init(results) {
-        console.log('📊 Initializing charts with results:', results);
+    function init(data) {
+        console.log('📊 Initializing charts with data:', data);
+        resultsData = data;
         
-        this.createBarChart(results);
-        this.createPieChart(results);
-        this.createLineChart(results);
-        this.createComparisonTable(results);
-    },
+        // Destroy existing charts
+        destroyCharts();
+        
+        // Create new charts
+        setTimeout(() => {
+            createBarChart();
+            createPieChart();
+            createLineChart();
+            createComparisonTable();
+        }, 300);
+    }
 
-    /**
-     * BAR CHART: Embodied vs Operational Carbon Comparison
-     */
-    createBarChart(results) {
+    function destroyCharts() {
+        if (barChart) barChart.destroy();
+        if (pieChart) pieChart.destroy();
+        if (lineChart) lineChart.destroy();
+    }
+
+    /* ========================================
+       BAR CHART - 6 SCENARIOS COMPARISON
+       ======================================== */
+    function createBarChart() {
         const ctx = document.getElementById('barChart');
-        if (!ctx) return;
+        if (!ctx || !resultsData) return;
 
-        // Destroy existing chart
-        if (this.barChart) {
-            this.barChart.destroy();
-        }
+        const scenarios = resultsData.allScenarios;
+        
+        // Ordenar cenários por total carbon (menor para maior)
+        const sortedScenarios = Object.keys(scenarios).sort((a, b) => 
+            scenarios[a].totalCarbon - scenarios[b].totalCarbon
+        );
 
-        this.barChart = new Chart(ctx, {
+        const labels = sortedScenarios.map(key => scenarios[key].name);
+        const embodiedData = sortedScenarios.map(key => scenarios[key].embodiedCarbon);
+        const operationalData = sortedScenarios.map(key => scenarios[key].operationalCarbon);
+        
+        // Cores: Verde para renovation, Vermelho para new build
+        const colors = sortedScenarios.map(key => 
+            scenarios[key].category === 'renovation' ? 'rgba(16, 185, 129, 0.8)' : 'rgba(239, 68, 68, 0.8)'
+        );
+        const borderColors = sortedScenarios.map(key => 
+            scenarios[key].category === 'renovation' ? '#10b981' : '#ef4444'
+        );
+
+        barChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Renovation', 'New Build'],
+                labels: labels,
                 datasets: [
                     {
                         label: 'Embodied Carbon',
-                        data: [
-                            results.renovation.embodiedCarbon,
-                            results.newBuild.embodiedCarbon
-                        ],
-                        backgroundColor: this.colors.embodied,
-                        borderRadius: 8
+                        data: embodiedData,
+                        backgroundColor: colors,
+                        borderColor: borderColors,
+                        borderWidth: 2,
+                        borderRadius: 8,
                     },
                     {
                         label: 'Operational Carbon',
-                        data: [
-                            results.renovation.operationalCarbon,
-                            results.newBuild.operationalCarbon
-                        ],
-                        backgroundColor: this.colors.operational,
-                        borderRadius: 8
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            padding: 15,
-                            font: { size: 13, weight: '500' },
-                            usePointStyle: true
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + 
-                                       context.parsed.y.toLocaleString() + ' tCO₂e';
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        stacked: true,
-                        grid: { display: false }
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString() + ' t';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    },
-
-    /**
-     * PIE CHART: Carbon Breakdown Percentages
-     */
-    createPieChart(results) {
-        const ctx = document.getElementById('pieChart');
-        if (!ctx) return;
-
-        if (this.pieChart) {
-            this.pieChart.destroy();
-        }
-
-        const total = results.renovation.totalCarbon;
-        const embodiedPercent = (results.renovation.embodiedCarbon / total * 100).toFixed(1);
-        const operationalPercent = (results.renovation.operationalCarbon / total * 100).toFixed(1);
-
-        this.pieChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: [
-                    `Embodied Carbon (${embodiedPercent}%)`,
-                    `Operational Carbon (${operationalPercent}%)`
-                ],
-                datasets: [{
-                    data: [
-                        results.renovation.embodiedCarbon,
-                        results.renovation.operationalCarbon
-                    ],
-                    backgroundColor: [
-                        this.colors.embodied,
-                        this.colors.operational
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            font: { size: 12, weight: '500' },
-                            usePointStyle: true
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const value = context.parsed;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percent = ((value / total) * 100).toFixed(1);
-                                return context.label + ': ' + 
-                                       value.toLocaleString() + ' tCO₂e (' + percent + '%)';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    },
-
-    /**
-     * LINE CHART: Lifecycle Carbon Timeline (Year-by-Year)
-     */
-    createLineChart(results) {
-        const ctx = document.getElementById('lineChart');
-        if (!ctx) return;
-
-        if (this.lineChart) {
-            this.lineChart.destroy();
-        }
-
-        const lifespan = results.inputs.lifespan;
-        const years = Array.from({length: lifespan + 1}, (_, i) => i);
-
-        // Calculate cumulative carbon over time
-        const renovationData = years.map(year => {
-            const embodied = results.renovation.embodiedCarbon;
-            const operational = (results.renovation.operationalCarbon / lifespan) * year;
-            return embodied + operational;
-        });
-
-        const newBuildData = years.map(year => {
-            const embodied = results.newBuild.embodiedCarbon;
-            const operational = (results.newBuild.operationalCarbon / lifespan) * year;
-            return embodied + operational;
-        });
-
-        this.lineChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: years,
-                datasets: [
-                    {
-                        label: 'Renovation',
-                        data: renovationData,
-                        borderColor: this.colors.renovation.primary,
-                        backgroundColor: this.colors.renovation.light + '20',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        pointHoverRadius: 5
-                    },
-                    {
-                        label: 'New Build',
-                        data: newBuildData,
-                        borderColor: this.colors.newbuild.primary,
-                        backgroundColor: this.colors.newbuild.light + '20',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        pointHoverRadius: 5
+                        data: operationalData,
+                        backgroundColor: colors.map(c => c.replace('0.8', '0.5')),
+                        borderColor: borderColors,
+                        borderWidth: 2,
+                        borderRadius: 8,
                     }
                 ]
             },
@@ -237,23 +86,244 @@ const ChartsModule = {
                 responsive: true,
                 maintainAspectRatio: true,
                 interaction: {
+                    mode: 'index',
                     intersect: false,
-                    mode: 'index'
                 },
                 plugins: {
+                    title: {
+                        display: true,
+                        text: 'Carbon Comparison Across 6 Scenarios',
+                        font: { size: 18, weight: 'bold' },
+                        color: '#1f2937',
+                        padding: { bottom: 20 }
+                    },
                     legend: {
+                        display: true,
                         position: 'top',
                         labels: {
+                            font: { size: 13, weight: '600' },
                             padding: 15,
-                            font: { size: 13, weight: '500' },
-                            usePointStyle: true
+                            usePointStyle: true,
+                            pointStyle: 'rectRounded'
                         }
                     },
                     tooltip: {
+                        backgroundColor: 'rgba(31, 41, 55, 0.95)',
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: true,
                         callbacks: {
-                            title: function(context) {
-                                return 'Year ' + context[0].label;
+                            label: function(context) {
+                                return context.dataset.label + ': ' + 
+                                       context.parsed.y.toLocaleString() + ' tCO₂e';
                             },
+                            footer: function(tooltipItems) {
+                                const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0);
+                                return 'Total: ' + total.toLocaleString() + ' tCO₂e';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 12, weight: '600' },
+                            color: '#374151',
+                            maxRotation: 45,
+                            minRotation: 0
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e5e7eb',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            font: { size: 12 },
+                            color: '#6b7280',
+                            callback: function(value) {
+                                return value.toLocaleString() + ' tCO₂e';
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Total Carbon Emissions (tCO₂e)',
+                            font: { size: 13, weight: '600' },
+                            color: '#374151'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* ========================================
+       PIE CHART - BREAKDOWN (BEST SCENARIOS)
+       ======================================== */
+    function createPieChart() {
+        const ctx = document.getElementById('pieChart');
+        if (!ctx || !resultsData) return;
+
+        const bestRenovation = resultsData.bestRenovation;
+        const bestNewbuild = resultsData.bestNewbuild;
+
+        pieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    bestRenovation.name + ' (Embodied)',
+                    bestRenovation.name + ' (Operational)',
+                    bestNewbuild.name + ' (Embodied)',
+                    bestNewbuild.name + ' (Operational)'
+                ],
+                datasets: [{
+                    data: [
+                        bestRenovation.embodiedCarbon,
+                        bestRenovation.operationalCarbon,
+                        bestNewbuild.embodiedCarbon,
+                        bestNewbuild.operationalCarbon
+                    ],
+                    backgroundColor: [
+                        '#10b981',  // Green - Renovation Embodied
+                        '#34d399',  // Light Green - Renovation Operational
+                        '#ef4444',  // Red - New Build Embodied
+                        '#f87171'   // Light Red - New Build Operational
+                    ],
+                    borderColor: '#ffffff',
+                    borderWidth: 3,
+                    hoverOffset: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Carbon Breakdown: Best Renovation vs Best New Build',
+                        font: { size: 18, weight: 'bold' },
+                        color: '#1f2937',
+                        padding: { bottom: 20 }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            font: { size: 12, weight: '600' },
+                            padding: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(31, 41, 55, 0.95)',
+                        titleFont: { size: 14, weight: 'bold' },
+                        bodyFont: { size: 13 },
+                        padding: 12,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return context.label + ': ' + value.toLocaleString() + 
+                                       ' tCO₂e (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* ========================================
+       LINE CHART - TIMELINE (CUMULATIVE)
+       ======================================== */
+    function createLineChart() {
+        const ctx = document.getElementById('lineChart');
+        if (!ctx || !resultsData) return;
+
+        const scenarios = resultsData.allScenarios;
+        const lifespan = resultsData.inputs.lifespan;
+        
+        // Generate years array (0 to lifespan)
+        const years = Array.from({ length: lifespan + 1 }, (_, i) => i);
+        
+        // Calculate cumulative carbon for each scenario
+        const datasets = Object.keys(scenarios).map(key => {
+            const scenario = scenarios[key];
+            const embodied = scenario.embodiedCarbon;
+            const operationalPerYear = scenario.operationalCarbon / lifespan;
+            
+            const cumulativeData = years.map(year => 
+                Math.round(embodied + (operationalPerYear * year))
+            );
+            
+            const isRenovation = scenario.category === 'renovation';
+            const color = isRenovation ? 
+                ['#10b981', '#34d399', '#6ee7b7'][Object.keys(scenarios).indexOf(key) % 3] :
+                ['#ef4444', '#f87171', '#fca5a5'][Object.keys(scenarios).indexOf(key) % 3];
+            
+            return {
+                label: scenario.name,
+                data: cumulativeData,
+                borderColor: color,
+                backgroundColor: color + '20',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: false,
+                pointRadius: 0,
+                pointHoverRadius: 6,
+                pointHoverBackgroundColor: color,
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 2
+            };
+        });
+
+        lineChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years.map(y => 'Year ' + y),
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Cumulative Carbon Over Building Lifespan',
+                        font: { size: 18, weight: 'bold' },
+                        color: '#1f2937',
+                        padding: { bottom: 20 }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            font: { size: 11, weight: '600' },
+                            padding: 10,
+                            usePointStyle: true,
+                            pointStyle: 'line'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(31, 41, 55, 0.95)',
+                        titleFont: { size: 13, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 8,
+                        callbacks: {
                             label: function(context) {
                                 return context.dataset.label + ': ' + 
                                        context.parsed.y.toLocaleString() + ' tCO₂e';
@@ -263,202 +333,126 @@ const ChartsModule = {
                 },
                 scales: {
                     x: {
-                        title: {
-                            display: true,
-                            text: 'Years',
-                            font: { size: 12, weight: '600' }
-                        },
-                        grid: { display: false }
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 11 },
+                            color: '#6b7280',
+                            maxTicksLimit: 15,
+                            callback: function(value, index) {
+                                // Show every 5 years
+                                return index % 5 === 0 ? 'Year ' + index : '';
+                            }
+                        }
                     },
                     y: {
                         beginAtZero: true,
+                        grid: {
+                            color: '#e5e7eb',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            font: { size: 11 },
+                            color: '#6b7280',
+                            callback: function(value) {
+                                return (value / 1000).toFixed(0) + 'k tCO₂e';
+                            }
+                        },
                         title: {
                             display: true,
                             text: 'Cumulative Carbon (tCO₂e)',
-                            font: { size: 12, weight: '600' }
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return value.toLocaleString() + ' t';
-                            }
+                            font: { size: 12, weight: '600' },
+                            color: '#374151'
                         }
                     }
                 }
             }
         });
-    },
-
-    /**
-     * COMPARISON TABLE: All 3 Scenarios Side-by-Side
-     */
-    createComparisonTable(results) {
-        const tbody = document.querySelector('#comparisonTable tbody');
-        if (!tbody) {
-            console.warn('⚠️ Comparison table tbody not found');
-            return;
-        }
-
-        // Calculate Light & Deep renovation scenarios
-        const light = this.calculateScenario('light', results.inputs);
-        const deep = this.calculateScenario('deep', results.inputs);
-        const newBuild = results.newBuild;
-
-        const scenarios = [
-            { name: 'Light Renovation', data: light },
-            { name: 'Deep Renovation', data: deep },
-            { name: 'New Build', data: newBuild }
-        ];
-
-        const metrics = [
-            { label: 'Total Carbon', key: 'totalCarbon', unit: ' tCO₂e', lower: true },
-            { label: 'Embodied Carbon', key: 'embodiedCarbon', unit: ' tCO₂e', lower: true },
-            { label: 'Operational Carbon', key: 'operationalCarbon', unit: ' tCO₂e', lower: true },
-            { label: 'Material Reuse Rate', key: 'reuseRate', unit: '%', higher: true },
-            { label: 'Carbon per m²', key: 'carbonPerM2', unit: ' kgCO₂e/m²', lower: true }
-        ];
-
-        tbody.innerHTML = '';
-
-        metrics.forEach(metric => {
-            const row = document.createElement('tr');
-            
-            // Metric name
-            const nameCell = document.createElement('td');
-            nameCell.className = 'metric-name';
-            nameCell.textContent = metric.label;
-            row.appendChild(nameCell);
-
-            // Values for each scenario
-            const values = scenarios.map(s => {
-                const val = s.data[metric.key];
-                // Handle undefined/null/NaN values
-                return (val !== undefined && val !== null && !isNaN(val)) ? val : 0;
-            });
-            
-            const bestValue = metric.lower 
-                ? Math.min(...values) 
-                : Math.max(...values);
-
-            scenarios.forEach((scenario, i) => {
-                const cell = document.createElement('td');
-                const value = values[i];
-                
-                // Format number safely
-                const formattedValue = typeof value === 'number' && !isNaN(value)
-                    ? value.toLocaleString('en-US', { maximumFractionDigits: 1 })
-                    : '0';
-                
-                cell.textContent = formattedValue + metric.unit;
-                
-                if (value === bestValue && value !== 0) {
-                    cell.classList.add('best-value');
-                }
-                
-                row.appendChild(cell);
-            });
-
-            tbody.appendChild(row);
-        });
-        
-        console.log('✅ Comparison table created');
-    },
-
-    /**
-     * Calculate scenario carbon based on type
-     */
-    calculateScenario(type, inputs) {
-        // Validate inputs
-        if (!inputs || typeof inputs !== 'object') {
-            console.error('❌ Invalid inputs for scenario calculation');
-            return this.getEmptyScenario();
-        }
-
-        const scenarioDefaults = {
-            light: { reuseRate: 90, embodiedFactor: 0.15, operationalImprovement: 0.25 },
-            deep: { reuseRate: 50, embodiedFactor: 0.50, operationalImprovement: 0.50 }
-        };
-
-        const scenario = scenarioDefaults[type];
-        if (!scenario) {
-            console.error(`❌ Unknown scenario type: ${type}`);
-            return this.getEmptyScenario();
-        }
-
-        const materialFactors = { 
-            concrete: 1.0, 
-            steel: 1.3, 
-            timber: 0.7, 
-            masonry: 0.9, 
-            mixed: 1.0 
-        };
-        
-        const climateMultipliers = { 
-            cold: 1.2, 
-            temperate: 1.0, 
-            warm: 0.9, 
-            hot: 1.1 
-        };
-
-        // Safely get values with defaults
-        const buildingArea = parseFloat(inputs.buildingArea) || 0;
-        const lifespan = parseFloat(inputs.lifespan) || 0;
-        const embodiedEnergy = parseFloat(inputs.embodiedEnergy) || 0;
-        const operationalEnergy = parseFloat(inputs.operationalEnergy) || 0;
-        const material = inputs.material || 'concrete';
-        const climate = inputs.climate || 'temperate';
-
-        const materialFactor = materialFactors[material] || 1.0;
-        const climateFactor = climateMultipliers[climate] || 1.0;
-
-        // Calculate carbon values
-        const embodiedCarbon = 
-            embodiedEnergy * 
-            buildingArea * 
-            scenario.embodiedFactor * 
-            materialFactor * 
-            (1 - scenario.reuseRate / 100);
-
-        const operationalCarbon = 
-            operationalEnergy * 
-            (1 - scenario.operationalImprovement) * 
-            buildingArea * 
-            climateFactor * 
-            lifespan;
-
-        const totalCarbon = embodiedCarbon + operationalCarbon;
-        const carbonPerM2 = buildingArea > 0 ? totalCarbon / buildingArea : 0;
-
-        return {
-            totalCarbon: Math.round(totalCarbon),
-            embodiedCarbon: Math.round(embodiedCarbon),
-            operationalCarbon: Math.round(operationalCarbon),
-            reuseRate: scenario.reuseRate,
-            carbonPerM2: Math.round(carbonPerM2)
-        };
-    },
-
-    /**
-     * Return empty scenario object (fallback)
-     */
-    getEmptyScenario() {
-        return {
-            totalCarbon: 0,
-            embodiedCarbon: 0,
-            operationalCarbon: 0,
-            reuseRate: 0,
-            carbonPerM2: 0
-        };
-    },
-
-    /**
-     * Destroy all charts (for cleanup)
-     */
-    destroy() {
-        if (this.barChart) this.barChart.destroy();
-        if (this.pieChart) this.pieChart.destroy();
-        if (this.lineChart) this.lineChart.destroy();
     }
-};
+
+    /* ========================================
+       COMPARISON TABLE - 6 SCENARIOS
+       ======================================== */
+    function createComparisonTable() {
+        const table = document.getElementById('comparisonTable');
+        if (!table || !resultsData) return;
+
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear existing
+
+        const scenarios = resultsData.allScenarios;
+        const scenarioKeys = Object.keys(scenarios);
+        
+        // Encontrar o melhor (menor) valor de cada métrica
+        const bestEmbodied = Math.min(...scenarioKeys.map(k => scenarios[k].embodiedCarbon));
+        const bestOperational = Math.min(...scenarioKeys.map(k => scenarios[k].operationalCarbon));
+        const bestTotal = Math.min(...scenarioKeys.map(k => scenarios[k].totalCarbon));
+
+        // Row 1: Total Carbon
+        const totalRow = document.createElement('tr');
+        totalRow.innerHTML = `
+            <td class="metric-name">Total Carbon</td>
+            ${scenarioKeys.map(key => {
+                const value = scenarios[key].totalCarbon;
+                const isBest = value === bestTotal;
+                return `<td class="${isBest ? 'best-value' : ''}">
+                    ${value.toLocaleString()} tCO₂e
+                    ${isBest ? ' ✓' : ''}
+                </td>`;
+            }).join('')}
+        `;
+        tbody.appendChild(totalRow);
+
+        // Row 2: Embodied Carbon
+        const embodiedRow = document.createElement('tr');
+        embodiedRow.innerHTML = `
+            <td class="metric-name">Embodied Carbon</td>
+            ${scenarioKeys.map(key => {
+                const value = scenarios[key].embodiedCarbon;
+                const isBest = value === bestEmbodied;
+                return `<td class="${isBest ? 'best-value' : ''}">
+                    ${value.toLocaleString()} tCO₂e
+                    ${isBest ? ' ✓' : ''}
+                </td>`;
+            }).join('')}
+        `;
+        tbody.appendChild(embodiedRow);
+
+        // Row 3: Operational Carbon
+        const operationalRow = document.createElement('tr');
+        operationalRow.innerHTML = `
+            <td class="metric-name">Operational Carbon</td>
+            ${scenarioKeys.map(key => {
+                const value = scenarios[key].operationalCarbon;
+                const isBest = value === bestOperational;
+                return `<td class="${isBest ? 'best-value' : ''}">
+                    ${value.toLocaleString()} tCO₂e
+                    ${isBest ? ' ✓' : ''}
+                </td>`;
+            }).join('')}
+        `;
+        tbody.appendChild(operationalRow);
+
+        // Row 4: Category
+        const categoryRow = document.createElement('tr');
+        categoryRow.innerHTML = `
+            <td class="metric-name">Category</td>
+            ${scenarioKeys.map(key => 
+                `<td>${scenarios[key].category === 'renovation' ? '🔨 Renovation' : '🏗️ New Build'}</td>`
+            ).join('')}
+        `;
+        tbody.appendChild(categoryRow);
+    }
+
+    /* ========================================
+       PUBLIC API
+       ======================================== */
+    return {
+        init: init,
+        destroy: destroyCharts
+    };
+})();
 
 // Expose to global scope
 window.ChartsModule = ChartsModule;
+
+console.log('✨ Charts module loaded (6 scenarios support)');

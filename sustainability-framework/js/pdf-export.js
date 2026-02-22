@@ -1,329 +1,451 @@
-/**
- * PDF Export Module - With All Charts
- * Generates PDF reports from calculation results
- */
+/* ========================================
+   BUILDING SUSTAINABILITY FRAMEWORK
+   PDF Export Module - 4 Pages with 6 Scenarios
+   ======================================== */
 
-(function() {
-    'use strict';
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadBtn = document.getElementById('downloadPdfBtn');
+    
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', generatePDF);
+    }
+});
 
-    const PDFExport = {
+async function generatePDF() {
+    const button = document.getElementById('downloadPdfBtn');
+    
+    // Disable button and show loading
+    button.disabled = true;
+    button.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="60" stroke-dashoffset="20" opacity="0.25"/>
+        </svg>
+        Generating PDF...
+    `;
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
         
-        init() {
-            console.log('🔍 Checking PDF libraries...');
-            
-            // Check if libraries are loaded
-            if (typeof html2canvas === 'undefined') {
-                console.error('❌ html2canvas not loaded');
-                return;
-            }
-            if (typeof window.jspdf === 'undefined') {
-                console.error('❌ jsPDF not loaded');
-                return;
-            }
-            
-            console.log('✅ PDF libraries loaded');
-            
-            const downloadBtn = document.getElementById('downloadPdfBtn');
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', () => {
-                    console.log('📄 PDF button clicked');
-                    this.generatePDF();
-                });
-                console.log('✅ PDF button listener attached');
-            } else {
-                console.error('❌ Download button not found');
-            }
-        },
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 15;
+        const contentWidth = pageWidth - (margin * 2);
 
-        async generatePDF() {
-            console.log('🚀 Starting PDF generation...');
-            
-            const btn = document.getElementById('downloadPdfBtn');
-            const originalHTML = btn.innerHTML;
-            
+        // ====================================
+        // PAGE 1: HEADER + DECISION + RESULTS
+        // ====================================
+        
+        // Header with dark green background
+        pdf.setFillColor(4, 120, 87); // #047857
+        pdf.rect(0, 0, pageWidth, 40, 'F');
+        
+        // Title
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(24);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('SustainaBuild', margin, 20);
+        
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Carbon Analysis Report', margin, 28);
+        
+        // Generation date
+        const today = new Date().toLocaleDateString('en-GB', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        });
+        pdf.setFontSize(10);
+        pdf.text('Generated: ' + today, pageWidth - margin - 40, 28);
+
+        // Reset text color
+        pdf.setTextColor(31, 41, 55);
+
+        // Decision Badge
+        const decisionText = document.getElementById('decisionText')?.textContent || 'RENOVATE';
+        const resultsTitle = document.getElementById('resultsTitle')?.textContent || 'Renovation is the better choice';
+        
+        const isRenovate = decisionText === 'RENOVATE';
+        pdf.setFillColor(isRenovate ? 4 : 220, isRenovate ? 120 : 38, isRenovate ? 87 : 38);
+        pdf.roundedRect(margin, 50, contentWidth, 20, 3, 3, 'F');
+        
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(decisionText, margin + 5, 58);
+        
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(resultsTitle, margin + 5, 65);
+
+        // Savings
+        const savingsAmount = document.getElementById('savingsAmount')?.textContent || '0 tCO₂e';
+        const savingsPercent = document.getElementById('savingsPercent')?.textContent || '(0%)';
+        
+        pdf.setTextColor(31, 41, 55);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Carbon Savings:', margin, 85);
+        
+        pdf.setFontSize(14);
+        pdf.setTextColor(4, 120, 87);
+        pdf.text(savingsAmount + ' ' + savingsPercent, margin, 93);
+
+        // Results Title
+        pdf.setTextColor(31, 41, 55);
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Carbon Comparison Results', margin, 110);
+
+        // Quick Stats
+        const renovationTotal = document.getElementById('renovationTotal')?.textContent || '0';
+        const newbuildTotal = document.getElementById('newbuildTotal')?.textContent || '0';
+        
+        // Renovation box
+        pdf.setFillColor(220, 252, 231); // Light green
+        pdf.setDrawColor(4, 120, 87); // Dark green border
+        pdf.setLineWidth(0.5);
+        pdf.roundedRect(margin, 120, (contentWidth / 2) - 5, 30, 2, 2, 'FD');
+        
+        pdf.setFontSize(10);
+        pdf.setTextColor(4, 120, 87);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Best Renovation', margin + 5, 128);
+        
+        pdf.setFontSize(18);
+        pdf.text(renovationTotal + ' tCO₂e', margin + 5, 140);
+
+        // New Build box
+        pdf.setFillColor(254, 226, 226); // Light red
+        pdf.setDrawColor(220, 38, 38); // Dark red border
+        pdf.roundedRect(margin + (contentWidth / 2) + 5, 120, (contentWidth / 2) - 5, 30, 2, 2, 'FD');
+        
+        pdf.setTextColor(220, 38, 38);
+        pdf.text('Best New Build', margin + (contentWidth / 2) + 10, 128);
+        
+        pdf.setFontSize(18);
+        pdf.text(newbuildTotal + ' tCO₂e', margin + (contentWidth / 2) + 10, 140);
+
+        // Breakdown
+        pdf.setTextColor(31, 41, 55);
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Detailed Breakdown', margin, 165);
+
+        const renovationEmbodied = document.getElementById('renovationEmbodied')?.textContent || '0';
+        const renovationOperational = document.getElementById('renovationOperational')?.textContent || '0';
+        const newbuildEmbodied = document.getElementById('newbuildEmbodied')?.textContent || '0';
+        const newbuildOperational = document.getElementById('newbuildOperational')?.textContent || '0';
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        // Renovation breakdown
+        pdf.text('Best Renovation:', margin, 175);
+        pdf.text('  • Embodied: ' + renovationEmbodied + ' tCO₂e', margin, 182);
+        pdf.text('  • Operational: ' + renovationOperational + ' tCO₂e', margin, 189);
+        
+        // New Build breakdown
+        pdf.text('Best New Build:', margin, 202);
+        pdf.text('  • Embodied: ' + newbuildEmbodied + ' tCO₂e', margin, 209);
+        pdf.text('  • Operational: ' + newbuildOperational + ' tCO₂e', margin, 216);
+
+        // Footer
+        pdf.setFontSize(8);
+        pdf.setTextColor(107, 114, 128);
+        pdf.text('SustainaBuild © 2026 | Research by Valentine Lhoest | Development by João Alfar', 
+                 pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+        // ====================================
+        // PAGE 2: COMPARISON TABLE (6 SCENARIOS)
+        // ====================================
+        
+        pdf.addPage();
+        
+        // Header
+        pdf.setFillColor(4, 120, 87);
+        pdf.rect(0, 0, pageWidth, 30, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('6 Scenarios Comparison Table', margin, 18);
+
+        // Capture table
+        const tableElement = document.getElementById('comparisonTable');
+        
+        if (tableElement) {
             try {
-                // Show loading
-                btn.disabled = true;
-                btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="60" stroke-dashoffset="20" opacity="0.25"/></svg> Generating PDF...';
+                // Switch to table tab to ensure it's visible
+                const tableTab = document.querySelector('[data-tab="table"]');
+                if (tableTab) tableTab.click();
                 
-                console.log('📦 Creating jsPDF instance...');
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF('p', 'mm', 'a4');
+                await new Promise(resolve => setTimeout(resolve, 300));
                 
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-                let yPos = 20;
+                const canvas = await html2canvas(tableElement, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    useCORS: true
+                });
                 
-                // ==========================================
-                // PAGE 1: HEADER & SUMMARY
-                // ==========================================
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = contentWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 
-                // Header
-                doc.setFontSize(22);
-                doc.setTextColor(4, 120, 87);
-                doc.text('SUSTAINABUILD', 20, yPos);
-                yPos += 10;
+                let yPosition = 40;
                 
-                doc.setFontSize(12);
-                doc.setTextColor(100, 100, 100);
-                doc.text('Building Sustainability Assessment Report', 20, yPos);
-                yPos += 15;
-                
-                // Date
-                const now = new Date();
-                const dateStr = now.toLocaleDateString('en-GB');
-                doc.setFontSize(10);
-                doc.text(`Generated: ${dateStr}`, 20, yPos);
-                yPos += 15;
-                
-                // Decision
-                const decision = document.getElementById('decisionText')?.textContent || 'N/A';
-                doc.setFontSize(18);
-                doc.setTextColor(4, 120, 87);
-                doc.text(`DECISION: ${decision}`, 20, yPos);
-                yPos += 12;
-                
-                // Title
-                const title = document.getElementById('resultsTitle')?.textContent || 'N/A';
-                doc.setFontSize(14);
-                doc.setTextColor(0, 0, 0);
-                doc.text(title, 20, yPos);
-                yPos += 15;
-                
-                // Carbon values
-                doc.setFontSize(12);
-                doc.text('Carbon Comparison:', 20, yPos);
-                yPos += 8;
-                
-                const renovationTotal = document.getElementById('renovationTotal')?.textContent || '0';
-                const newbuildTotal = document.getElementById('newbuildTotal')?.textContent || '0';
-                
-                doc.setFontSize(11);
-                doc.text(`Renovation: ${renovationTotal} tCO₂e`, 30, yPos);
-                yPos += 6;
-                doc.text(`New Build: ${newbuildTotal} tCO₂e`, 30, yPos);
-                yPos += 10;
-                
-                // Savings
-                const savingsAmount = document.getElementById('savingsAmount')?.textContent || '0';
-                const savingsPercent = document.getElementById('savingsPercent')?.textContent || '0';
-                
-                doc.setTextColor(4, 120, 87);
-                doc.text(`Savings: ${savingsAmount} ${savingsPercent}`, 30, yPos);
-                yPos += 15;
-                
-                // Building inputs
-                doc.setFontSize(12);
-                doc.setTextColor(0, 0, 0);
-                doc.text('Building Inputs:', 20, yPos);
-                yPos += 8;
-                
-                const formData = window.calculatorDebug?.formData || {};
-                
-                doc.setFontSize(10);
-                doc.text(`Area: ${formData.buildingArea || 'N/A'} m²`, 30, yPos);
-                yPos += 5;
-                doc.text(`Lifespan: ${formData.lifespan || 'N/A'} years`, 30, yPos);
-                yPos += 5;
-                doc.text(`Material: ${formData.structuralMaterial || 'N/A'}`, 30, yPos);
-                yPos += 5;
-                doc.text(`Climate: ${formData.climateZone || 'N/A'}`, 30, yPos);
-                yPos += 15;
-                
-                // ==========================================
-                // CHARTS - ALL 4 VISUALIZATIONS
-                // ==========================================
-                
-                console.log('📊 Capturing all charts...');
-                
-                const charts = [
-                    { id: 'barChart', title: '1. Carbon Comparison (Bar Chart)' },
-                    { id: 'pieChart', title: '2. Carbon Breakdown (Pie Chart)' },
-                    { id: 'lineChart', title: '3. Lifecycle Timeline (Line Chart)' }
-                ];
-                
-                for (let i = 0; i < charts.length; i++) {
-                    const chart = charts[i];
-                    const canvas = document.getElementById(chart.id);
-                    
-                    if (canvas) {
-                        try {
-                            // Check if we need a new page
-                            if (yPos > pageHeight - 90) {
-                                doc.addPage();
-                                yPos = 20;
-                            }
-                            
-                            // Chart title
-                            doc.setFontSize(13);
-                            doc.setTextColor(0, 0, 0);
-                            doc.setFont('helvetica', 'bold');
-                            doc.text(chart.title, 20, yPos);
-                            yPos += 8;
-                            doc.setFont('helvetica', 'normal');
-                            
-                            // Chart image
-                            const chartImage = canvas.toDataURL('image/png', 1.0);
-                            doc.addImage(chartImage, 'PNG', 20, yPos, 170, 70);
-                            yPos += 78;
-                            
-                            console.log(`✅ ${chart.title} added to PDF`);
-                        } catch (chartError) {
-                            console.warn(`⚠️ ${chart.title} capture failed:`, chartError);
-                            doc.setFontSize(10);
-                            doc.setTextColor(150, 150, 150);
-                            doc.text(`(${chart.title} not available)`, 30, yPos);
-                            yPos += 10;
-                        }
-                    }
+                // Se a tabela for muito grande, ajusta o tamanho
+                if (imgHeight > pageHeight - 60) {
+                    const scaledHeight = pageHeight - 60;
+                    const scaledWidth = (canvas.width * scaledHeight) / canvas.height;
+                    pdf.addImage(imgData, 'PNG', margin, yPosition, scaledWidth, scaledHeight);
+                } else {
+                    pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight);
                 }
-                
-                // ==========================================
-                // COMPARISON TABLE (NEW PAGE)
-                // ==========================================
-                
-                doc.addPage();
-                yPos = 20;
-                
-                doc.setFontSize(13);
-                doc.setTextColor(0, 0, 0);
-                doc.setFont('helvetica', 'bold');
-                doc.text('4. Scenario Comparison Table', 20, yPos);
-                yPos += 10;
-                doc.setFont('helvetica', 'normal');
-                
-                // Get table data
-                const table = document.getElementById('comparisonTable');
-                if (table) {
-                    try {
-                        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
-                        const rows = Array.from(table.querySelectorAll('tbody tr'));
-                        
-                        // Table settings
-                        const colWidths = [50, 40, 40, 40];
-                        const startX = 20;
-                        let tableY = yPos;
-                        
-                        // Draw header
-                        doc.setFontSize(9);
-                        doc.setFont('helvetica', 'bold');
-                        doc.setFillColor(248, 250, 252);
-                        doc.rect(startX, tableY, 170, 8, 'F');
-                        
-                        let xPos = startX + 2;
-                        headers.forEach((header, i) => {
-                            doc.text(header, xPos, tableY + 5.5);
-                            xPos += colWidths[i];
-                        });
-                        tableY += 8;
-                        
-                        // Draw rows
-                        doc.setFont('helvetica', 'normal');
-                        rows.forEach((row, rowIndex) => {
-                            const cells = Array.from(row.querySelectorAll('td')).map(td => td.textContent.trim());
-                            
-                            // Alternate row background
-                            if (rowIndex % 2 === 0) {
-                                doc.setFillColor(255, 255, 255);
-                            } else {
-                                doc.setFillColor(248, 250, 252);
-                            }
-                            doc.rect(startX, tableY, 170, 7, 'F');
-                            
-                            xPos = startX + 2;
-                            cells.forEach((cell, i) => {
-                                // Highlight best values in green
-                                const tdElement = row.querySelectorAll('td')[i];
-                                if (tdElement && tdElement.classList.contains('best-value')) {
-                                    doc.setTextColor(4, 120, 87);
-                                    doc.setFont('helvetica', 'bold');
-                                } else if (i === 0) {
-                                    doc.setTextColor(0, 0, 0);
-                                    doc.setFont('helvetica', 'bold');
-                                } else {
-                                    doc.setTextColor(0, 0, 0);
-                                    doc.setFont('helvetica', 'normal');
-                                }
-                                
-                                doc.text(cell, xPos, tableY + 5);
-                                xPos += colWidths[i];
-                            });
-                            
-                            tableY += 7;
-                        });
-                        
-                        console.log('✅ Comparison table added to PDF');
-                        
-                    } catch (tableError) {
-                        console.warn('⚠️ Table capture failed:', tableError);
-                        doc.setFontSize(10);
-                        doc.setTextColor(150, 150, 150);
-                        doc.text('(Comparison table not available)', 30, yPos);
-                    }
-                }
-                
-                // ==========================================
-                // FOOTER (ALL PAGES)
-                // ==========================================
-                
-                const totalPages = doc.internal.getNumberOfPages();
-                for (let i = 1; i <= totalPages; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(9);
-                    doc.setTextColor(150, 150, 150);
-                    doc.text('Generated by SustainaBuild v1.0', 20, pageHeight - 20);
-                    doc.text('Academic Research Tool - Valentine Lhoest', 20, pageHeight - 15);
-                    doc.text(`Page ${i} of ${totalPages}`, pageWidth - 40, pageHeight - 15);
-                }
-                
-                // ==========================================
-                // SAVE PDF
-                // ==========================================
-                
-                console.log('💾 Saving PDF...');
-                const fileName = `SustainaBuild_Report_${dateStr.replace(/\//g, '-')}.pdf`;
-                doc.save(fileName);
-                
-                console.log('✅ PDF saved successfully!');
-                this.showToast('✅ PDF with all charts downloaded!', 'success');
                 
             } catch (error) {
-                console.error('❌ PDF generation error:', error);
-                this.showToast('❌ Error: ' + error.message, 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalHTML;
+                console.error('Error capturing table:', error);
+                pdf.setTextColor(220, 38, 38);
+                pdf.setFontSize(10);
+                pdf.text('Error: Could not capture comparison table', margin, 50);
             }
-        },
-
-        showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.textContent = message;
-            toast.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: ${type === 'success' ? '#047857' : '#dc2626'};
-                color: white;
-                padding: 1rem 1.5rem;
-                border-radius: 8px;
-                font-weight: 600;
-                z-index: 9999;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            `;
-            
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+        } else {
+            pdf.setTextColor(220, 38, 38);
+            pdf.setFontSize(10);
+            pdf.text('Error: Comparison table not found', margin, 50);
         }
-    };
 
-    // Initialize
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => PDFExport.init());
-    } else {
-        PDFExport.init();
+        // Footer
+        pdf.setFontSize(8);
+        pdf.setTextColor(107, 114, 128);
+        pdf.text('Page 2 of 4 | SustainaBuild Carbon Analysis Report', 
+                 pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+        // ====================================
+        // PAGE 3: BAR CHART + PIE CHART
+        // ====================================
+        
+        pdf.addPage();
+        
+        // Header
+        pdf.setFillColor(4, 120, 87);
+        pdf.rect(0, 0, pageWidth, 30, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Visual Analysis', margin, 18);
+
+        // Bar Chart
+        const barChartElement = document.getElementById('barChart');
+        if (barChartElement) {
+            try {
+                // Switch to comparison tab
+                const comparisonTab = document.querySelector('[data-tab="comparison"]');
+                if (comparisonTab) comparisonTab.click();
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                const canvas = await html2canvas(barChartElement.parentElement, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = contentWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', margin, 40, imgWidth, imgHeight);
+                
+            } catch (error) {
+                console.error('Error capturing bar chart:', error);
+            }
+        }
+
+        // Pie Chart
+        const pieChartElement = document.getElementById('pieChart');
+        if (pieChartElement) {
+            try {
+                // Switch to breakdown tab
+                const breakdownTab = document.querySelector('[data-tab="breakdown"]');
+                if (breakdownTab) breakdownTab.click();
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                const canvas = await html2canvas(pieChartElement.parentElement, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = contentWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', margin, 160, imgWidth, imgHeight);
+                
+            } catch (error) {
+                console.error('Error capturing pie chart:', error);
+            }
+        }
+
+        // Footer
+        pdf.setFontSize(8);
+        pdf.setTextColor(107, 114, 128);
+        pdf.text('Page 3 of 4 | SustainaBuild Carbon Analysis Report', 
+                 pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+        // ====================================
+        // PAGE 4: LINE CHART + BUILDING INPUTS
+        // ====================================
+        
+        pdf.addPage();
+        
+        // Header
+        pdf.setFillColor(4, 120, 87);
+        pdf.rect(0, 0, pageWidth, 30, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Timeline & Building Inputs', margin, 18);
+
+        // Line Chart
+        const lineChartElement = document.getElementById('lineChart');
+        if (lineChartElement) {
+            try {
+                // Switch to timeline tab
+                const timelineTab = document.querySelector('[data-tab="timeline"]');
+                if (timelineTab) timelineTab.click();
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                const canvas = await html2canvas(lineChartElement.parentElement, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = contentWidth;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', margin, 40, imgWidth, imgHeight);
+                
+            } catch (error) {
+                console.error('Error capturing line chart:', error);
+            }
+        }
+
+        // Building Inputs Summary
+        pdf.setTextColor(31, 41, 55);
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Building Inputs Summary', margin, 170);
+
+        const buildingArea = document.getElementById('building-area')?.value || 'N/A';
+        const lifespan = document.getElementById('lifespan')?.value || 'N/A';
+        const structuralMaterial = document.getElementById('structural-material')?.value || 'N/A';
+        const climateZone = document.getElementById('climate-zone')?.value || 'N/A';
+        const embodiedEnergy = document.getElementById('embodied-energy')?.value || 'N/A';
+        const operationalEnergy = document.getElementById('operational-energy')?.value || 'N/A';
+        const reuseRate = document.getElementById('reuse-rate')?.value || 'N/A';
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        let yPos = 180;
+        const inputs = [
+            ['Building Area:', buildingArea + ' m²'],
+            ['Expected Lifespan:', lifespan + ' years'],
+            ['Structural Material:', structuralMaterial.charAt(0).toUpperCase() + structuralMaterial.slice(1)],
+            ['Climate Zone:', climateZone.charAt(0).toUpperCase() + climateZone.slice(1)],
+            ['Embodied Energy Factor:', embodiedEnergy + ' kgCO₂/m²'],
+            ['Operational Energy:', operationalEnergy + ' kWh/m²/yr'],
+            ['Material Reuse Rate:', reuseRate + '%']
+        ];
+
+        inputs.forEach(([label, value]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label, margin, yPos);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value, margin + 60, yPos);
+            yPos += 7;
+        });
+
+        // Methodology Note
+        pdf.setFillColor(254, 243, 199); // Yellow background
+        pdf.roundedRect(margin, yPos + 10, contentWidth, 35, 2, 2, 'F');
+        
+        pdf.setTextColor(180, 83, 9);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Methodology:', margin + 3, yPos + 18);
+        
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(120, 53, 15);
+        const methodologyText = 'This analysis evaluates 6 scenarios (Light, Medium, Deep Renovation vs Code-Compliant, High-Performance, Low-Carbon New Build) using whole-life carbon methodology. Results based on research by Valentine Lhoest.';
+        const splitText = pdf.splitTextToSize(methodologyText, contentWidth - 10);
+        pdf.text(splitText, margin + 3, yPos + 25);
+
+        // Footer
+        pdf.setFontSize(8);
+        pdf.setTextColor(107, 114, 128);
+        pdf.text('Page 4 of 4 | SustainaBuild Carbon Analysis Report | www.sustainabuild.com', 
+                 pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+        // ====================================
+        // SAVE PDF
+        // ====================================
+        
+        const filename = 'SustainaBuild_Report_' + 
+                        today.replace(/\//g, '-') + '.pdf';
+        
+        pdf.save(filename);
+
+        // Success message
+        showSuccessMessage('PDF downloaded successfully!');
+
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        alert('Error generating PDF. Please try again.');
+    } finally {
+        // Reset button
+        button.disabled = false;
+        button.innerHTML = `
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Download PDF
+        `;
     }
+}
 
-    window.PDFExport = PDFExport;
+function showSuccessMessage(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        z-index: 9999;
+        animation: slideInRight 0.3s ease-out;
+        box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
 
-})();
+console.log('✨ PDF Export module loaded (4 pages with 6 scenarios table)');

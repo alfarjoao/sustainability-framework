@@ -1,29 +1,56 @@
 /* ========================================
    BUILDING SUSTAINABILITY FRAMEWORK
-   Calculator Logic - Enhanced with Real-Time Validation
+   Calculator Logic - 6 Scenarios Comparison
    ======================================== */
 
 // State Management
 let currentStep = 1;
-const totalSteps = 3;
+const totalSteps = 2; // APENAS 2 STEPS AGORA
 let formData = {};
 
-// Scenario Defaults
+// 6 CENÁRIOS COM VALORES PLACEHOLDER (Valentine vai fornecer os reais)
 const scenarioDefaults = {
     'light-renovation': {
-        reuseRate: 90,
-        embodiedFactor: 0.15,
-        operationalImprovement: 0.25
+        name: 'Light Renovation',
+        reuseRate: 0.90,           // 90% material reuse
+        embodiedFactor: 0.15,      // 15% of base embodied energy
+        operationalImprovement: 0.25, // 25% operational improvement
+        category: 'renovation'
+    },
+    'medium-renovation': {
+        name: 'Medium Renovation',
+        reuseRate: 0.70,           // 70% material reuse
+        embodiedFactor: 0.35,      // 35% of base embodied energy
+        operationalImprovement: 0.40, // 40% operational improvement
+        category: 'renovation'
     },
     'deep-renovation': {
-        reuseRate: 50,
-        embodiedFactor: 0.50,
-        operationalImprovement: 0.50
+        name: 'Deep Renovation',
+        reuseRate: 0.50,           // 50% material reuse
+        embodiedFactor: 0.60,      // 60% of base embodied energy
+        operationalImprovement: 0.55, // 55% operational improvement
+        category: 'renovation'
     },
-    'new-build': {
-        reuseRate: 10,
-        embodiedFactor: 1.50,
-        operationalImprovement: 0.70
+    'code-compliant-new': {
+        name: 'Code-Compliant New Build',
+        reuseRate: 0.10,           // 10% material reuse
+        embodiedFactor: 1.50,      // 150% of base embodied energy
+        operationalImprovement: 0.60, // 60% operational improvement
+        category: 'newbuild'
+    },
+    'high-performance-new': {
+        name: 'High-Performance New Build',
+        reuseRate: 0.05,           // 5% material reuse
+        embodiedFactor: 1.30,      // 130% of base embodied energy
+        operationalImprovement: 0.75, // 75% operational improvement
+        category: 'newbuild'
+    },
+    'low-carbon-new': {
+        name: 'Low-Carbon New Build',
+        reuseRate: 0.15,           // 15% material reuse (recycled materials)
+        embodiedFactor: 0.90,      // 90% of base embodied energy (low-carbon materials)
+        operationalImprovement: 0.80, // 80% operational improvement
+        category: 'newbuild'
     }
 };
 
@@ -58,7 +85,6 @@ const form = document.getElementById('calculator-form');
 const btnNext = document.getElementById('btn-next');
 const btnBack = document.getElementById('btn-back');
 const formSections = document.querySelectorAll('.form-section');
-const scenarioCards = document.querySelectorAll('.scenario-card');
 const resultsSection = document.getElementById('results');
 
 // Initialize
@@ -72,13 +98,6 @@ document.addEventListener('DOMContentLoaded', function() {
    EVENT LISTENERS
    ======================================== */
 function setupEventListeners() {
-    // Scenario selection
-    scenarioCards.forEach(card => {
-        card.addEventListener('click', function() {
-            selectScenario(this);
-        });
-    });
-
     // Navigation buttons
     btnNext.addEventListener('click', handleNext);
     btnBack.addEventListener('click', handleBack);
@@ -160,36 +179,6 @@ function validateInput(input) {
     }
     
     return true;
-}
-
-/* ========================================
-   SCENARIO SELECTION
-   ======================================== */
-function selectScenario(card) {
-    // Remove previous selection with fade
-    scenarioCards.forEach(c => {
-        c.classList.remove('selected');
-        c.style.transform = 'scale(1)';
-    });
-    
-    // Add selection with animation
-    card.classList.add('selected');
-    card.style.transform = 'scale(1.02)';
-    
-    // Reset after animation
-    setTimeout(() => {
-        card.style.transform = '';
-    }, 300);
-    
-    // Store value
-    const scenario = card.dataset.scenario;
-    document.getElementById('selected-scenario').value = scenario;
-    formData.scenario = scenario;
-    
-    // Enable next button with subtle animation
-    btnNext.disabled = false;
-    btnNext.style.opacity = '1';
-    btnNext.style.transform = 'translateY(0)';
 }
 
 /* ========================================
@@ -341,9 +330,6 @@ function updateButtons() {
         }, 50);
     }
     
-    // Update next button state
-    btnNext.disabled = currentStep === 1 && !formData.scenario;
-    
     // Update button text with smooth transition
     btnNext.style.opacity = '0.7';
     setTimeout(() => {
@@ -368,7 +354,7 @@ function updateButtons() {
 }
 
 /* ========================================
-   CALCULATIONS
+   CALCULATIONS - 6 SCENARIOS
    ======================================== */
 function calculateResults() {
     // Show loading state
@@ -388,66 +374,91 @@ function calculateResults() {
 
 function performCalculation() {
     // Get form data
-    const scenario = formData.scenario;
     const area = parseFloat(formData.buildingArea);
     const lifespan = parseFloat(formData.lifespan);
     const embodiedEnergy = parseFloat(formData.embodiedEnergy);
     const operationalEnergy = parseFloat(formData.operationalEnergy);
     const material = formData.structuralMaterial;
     const climate = formData.climateZone;
-    const customReuseRate = formData.reuseRate ? parseFloat(formData.reuseRate) / 100 : null;
-
-    // Get scenario defaults
-    const scenarioData = scenarioDefaults[scenario];
-    const reuseRate = customReuseRate !== null ? customReuseRate : scenarioData.reuseRate / 100;
-    const embodiedFactor = scenarioData.embodiedFactor;
-    const operationalImprovement = scenarioData.operationalImprovement;
+    const userReuseRate = parseFloat(formData.reuseRate) / 100; // Convert to decimal
 
     // Get multipliers
     const materialFactor = materialFactors[material] || 1.0;
     const climateFactor = climateMultipliers[climate] || 1.0;
 
-    // RENOVATION CALCULATIONS
-    const renovationEmbodied = embodiedEnergy * area * embodiedFactor * materialFactor * (1 - reuseRate);
-    const renovationOperational = operationalEnergy * (1 - operationalImprovement) * area * climateFactor * lifespan;
-    const renovationTotal = renovationEmbodied + renovationOperational;
+    // CALCULAR OS 6 CENÁRIOS
+    const scenarios = {};
+    
+    Object.keys(scenarioDefaults).forEach(scenarioKey => {
+        const scenario = scenarioDefaults[scenarioKey];
+        
+        // Use user's reuse rate OR scenario default
+        const reuseRate = userReuseRate; // Sempre usa o input do utilizador
+        const embodiedFactor = scenario.embodiedFactor;
+        const operationalImprovement = scenario.operationalImprovement;
 
-    // NEW BUILD CALCULATIONS
-    const newBuildEmbodied = embodiedEnergy * area * 1.5 * materialFactor;
-    const newBuildOperational = operationalEnergy * 0.3 * area * climateFactor * lifespan;
-    const newBuildTotal = newBuildEmbodied + newBuildOperational;
+        // EMBODIED CARBON
+        const embodiedCarbon = embodiedEnergy * area * embodiedFactor * materialFactor * (1 - reuseRate);
 
-    // DECISION
-    const decision = renovationTotal < newBuildTotal ? 'RENOVATE' : 'DEMOLISH & NEW BUILD';
-    const savings = Math.abs(renovationTotal - newBuildTotal);
-    const savingsPercentage = ((savings / Math.max(renovationTotal, newBuildTotal)) * 100).toFixed(1);
+        // OPERATIONAL CARBON
+        const operationalCarbon = operationalEnergy * (1 - operationalImprovement) * area * climateFactor * lifespan * 0.5; // 0.5 = grid carbon intensity placeholder
 
-    // Prepare results object for charts
+        // TOTAL
+        const totalCarbon = embodiedCarbon + operationalCarbon;
+
+        scenarios[scenarioKey] = {
+            name: scenario.name,
+            category: scenario.category,
+            embodiedCarbon: Math.round(embodiedCarbon),
+            operationalCarbon: Math.round(operationalCarbon),
+            totalCarbon: Math.round(totalCarbon)
+        };
+    });
+
+    console.log('📊 Calculated 6 scenarios:', scenarios);
+
+    // ENCONTRAR O MELHOR DE CADA CATEGORIA
+    const renovationScenarios = Object.keys(scenarios).filter(k => scenarios[k].category === 'renovation');
+    const newbuildScenarios = Object.keys(scenarios).filter(k => scenarios[k].category === 'newbuild');
+
+    const bestRenovationKey = renovationScenarios.reduce((best, current) => 
+        scenarios[current].totalCarbon < scenarios[best].totalCarbon ? current : best
+    );
+
+    const bestNewbuildKey = newbuildScenarios.reduce((best, current) => 
+        scenarios[current].totalCarbon < scenarios[best].totalCarbon ? current : best
+    );
+
+    const bestRenovation = scenarios[bestRenovationKey];
+    const bestNewbuild = scenarios[bestNewbuildKey];
+
+    // DECISÃO: RENOVATE OU DEMOLISH & REBUILD
+    const decision = bestRenovation.totalCarbon < bestNewbuild.totalCarbon ? 'RENOVATE' : 'DEMOLISH & REBUILD';
+    const recommended = decision === 'RENOVATE' ? bestRenovation.name : bestNewbuild.name;
+    const savings = Math.abs(bestRenovation.totalCarbon - bestNewbuild.totalCarbon);
+    const savingsPercentage = ((savings / Math.max(bestRenovation.totalCarbon, bestNewbuild.totalCarbon)) * 100).toFixed(1);
+
+    // Prepare results object
     const results = {
         decision: decision,
-        savings: Math.round(savings),
+        recommended: recommended,
+        savings: savings,
         savingsPercent: savingsPercentage,
-        renovation: {
-            totalCarbon: Math.round(renovationTotal),
-            embodiedCarbon: Math.round(renovationEmbodied),
-            operationalCarbon: Math.round(renovationOperational)
-        },
-        newBuild: {
-            totalCarbon: Math.round(newBuildTotal),
-            embodiedCarbon: Math.round(newBuildEmbodied),
-            operationalCarbon: Math.round(newBuildOperational)
-        },
+        bestRenovation: bestRenovation,
+        bestNewbuild: bestNewbuild,
+        allScenarios: scenarios,
         inputs: {
-            scenario: scenario,
             buildingArea: area,
             lifespan: lifespan,
             embodiedEnergy: embodiedEnergy,
             operationalEnergy: operationalEnergy,
             material: material,
             climate: climate,
-            reuseRate: reuseRate * 100
+            reuseRate: userReuseRate * 100
         }
     };
+
+    console.log('✅ Final results:', results);
 
     // Display results with animation
     displayResults(results);
@@ -466,27 +477,27 @@ function displayResults(results) {
 
     if (results.decision === 'RENOVATE') {
         if (decisionBadge) {
-            decisionBadge.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-light))';
+            decisionBadge.style.background = 'linear-gradient(to right, #047857 0%, #059669 50%, #047857 100%)';
         }
         if (decisionText) {
             decisionText.textContent = 'RENOVATE';
         }
         if (resultsTitle) {
-            resultsTitle.textContent = 'Renovation is the better choice';
+            resultsTitle.textContent = results.recommended + ' is the better choice';
         }
     } else {
         if (decisionBadge) {
-            decisionBadge.style.background = 'linear-gradient(135deg, var(--accent), #ef4444)';
+            decisionBadge.style.background = 'linear-gradient(to right, #dc2626 0%, #ef4444 50%, #dc2626 100%)';
         }
         if (decisionText) {
             decisionText.textContent = 'DEMOLISH & REBUILD';
         }
         if (resultsTitle) {
-            resultsTitle.textContent = 'New build is recommended';
+            resultsTitle.textContent = results.recommended + ' is recommended';
         }
     }
 
-    // Update subtitle with savings
+    // Update savings
     const savingsAmount = document.getElementById('savingsAmount');
     const savingsPercent = document.getElementById('savingsPercent');
     if (savingsAmount) {
@@ -496,16 +507,16 @@ function displayResults(results) {
         savingsPercent.textContent = '(' + results.savingsPercent + '%)';
     }
 
-    // Update carbon values with animation
-    animateNumber('renovationTotal', 0, results.renovation.totalCarbon, 1500);
-    animateNumber('renovationEmbodied', 0, results.renovation.embodiedCarbon, 1500);
-    animateNumber('renovationOperational', 0, results.renovation.operationalCarbon, 1500);
+    // Update quick stats (Best Renovation vs Best New Build)
+    animateNumber('renovationTotal', 0, results.bestRenovation.totalCarbon, 1500);
+    animateNumber('renovationEmbodied', 0, results.bestRenovation.embodiedCarbon, 1500);
+    animateNumber('renovationOperational', 0, results.bestRenovation.operationalCarbon, 1500);
     
-    animateNumber('newbuildTotal', 0, results.newBuild.totalCarbon, 1500);
-    animateNumber('newbuildEmbodied', 0, results.newBuild.embodiedCarbon, 1500);
-    animateNumber('newbuildOperational', 0, results.newBuild.operationalCarbon, 1500);
+    animateNumber('newbuildTotal', 0, results.bestNewbuild.totalCarbon, 1500);
+    animateNumber('newbuildEmbodied', 0, results.bestNewbuild.embodiedCarbon, 1500);
+    animateNumber('newbuildOperational', 0, results.bestNewbuild.operationalCarbon, 1500);
 
-    // Initialize charts
+    // Initialize charts (vai mostrar os 6 cenários)
     if (window.ChartsModule) {
         setTimeout(() => {
             window.ChartsModule.init(results);
@@ -632,11 +643,6 @@ animationStyles.textContent = `
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    /* Scenario Card Transitions */
-    .scenario-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
     /* Input States */
     .form-input.input-valid,
     .form-select.input-valid {
@@ -709,4 +715,4 @@ window.calculatorDebug = {
     validate: () => validateCurrentStep()
 };
 
-console.log('✨ Calculator initialized with real-time validation');
+console.log('✨ Calculator initialized with 6-scenario comparison logic');
