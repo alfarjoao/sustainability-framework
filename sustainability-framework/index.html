@@ -3,9 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Building Sustainability Framework | Renovation vs Demolition Decision Tool</title>
-    <meta name="description" content="Evidence-based decision framework for sustainable building practices. Multi-variable carbon analysis for architects and engineers.">
+    
+    <!-- Primary Meta Tags -->
+    <title>SustainaBuild | Renovation vs Demolition Carbon Calculator</title>
+    <meta name="title" content="SustainaBuild | Renovation vs Demolition Carbon Calculator">
+    <meta name="description" content="Free evidence-based carbon calculator for building renovation vs demolition decisions. Multi-variable whole-life carbon analysis tool for architects, engineers, and sustainability professionals.">
+    <meta name="keywords" content="carbon calculator, embodied carbon, operational carbon, renovation, demolition, sustainability, net zero, building lifecycle assessment, LCA, whole-life carbon, construction emissions">
+    <meta name="author" content="Valentine Lhoest, João Alfar">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sustainability-framework.vercel.app/">
+    <meta property="og:title" content="SustainaBuild | Renovation vs Demolition Carbon Calculator">
+    <meta property="og:description" content="Make data-driven decisions with our free whole-life carbon assessment tool. Compare renovation vs demolition scenarios in minutes.">
+    <meta property="og:image" content="https://sustainability-framework.vercel.app/og-image.png">
+    <meta property="og:site_name" content="SustainaBuild">
+    <meta property="og:locale" content="en_US">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://sustainability-framework.vercel.app/">
+    <meta property="twitter:title" content="SustainaBuild | Renovation vs Demolition Carbon Calculator">
+    <meta property="twitter:description" content="Free carbon calculator for sustainable building decisions. Multi-variable analysis for Net Zero 2050 goals.">
+    <meta property="twitter:image" content="https://sustainability-framework.vercel.app/og-image.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://sustainability-framework.vercel.app/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="css/main.css">
+    
+    <!-- Preconnect to external CDNs for performance -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
 </head>
 <body>
     <!-- Announcement Bar -->
@@ -19,11 +53,11 @@
     <div class="top-header">
         <div class="top-header-container">
             <div class="top-header-left">
-                <a href="mailto:info@sustainabuild.com">
+                <a href="mailto:valentine.lhoest1@gmail.com">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3 8L10.89 13.26C11.2187 13.4793 11.6049 13.5963 12 13.5963C12.3951 13.5963 12.7813 13.4793 13.11 13.26L21 8M5 19H19C19.5304 19 20.0391 18.7893 20.4142 18.4142C20.7893 18.0391 21 17.5304 21 17V7C21 6.46957 20.7893 5.96086 20.4142 5.58579C20.0391 5.21071 19.5304 5 19 5H5C4.46957 5 3.96086 5.21071 3.58579 5.58579C3.21071 5.96086 3 6.46957 3 7V17C3 17.5304 3.21071 18.0391 3.58579 18.4142C3.96086 18.7893 4.46957 19 5 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    info@sustainabuild.com
+                    valentine.lhoest1@gmail.com
                 </a>
             </div>
             <div class="top-header-right">
@@ -48,6 +82,7 @@
             <div class="nav-links desktop-nav">
                 <a href="#calculator">Calculator</a>
                 <a href="#methodology">Methodology</a>
+                <a href="#faq">FAQ</a>
                 <a href="#about">About</a>
             </div>
 
@@ -111,6 +146,16 @@
                         </svg>
                     </span>
                     <span>Methodology</span>
+                </a>
+                <a href="#faq" class="mobile-nav-link">
+                    <span class="mobile-nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span>FAQ</span>
                 </a>
                 <a href="#about" class="mobile-nav-link">
                     <span class="mobile-nav-icon">
@@ -313,238 +358,238 @@
     </section>
 
     <!-- CALCULATOR SECTION -->
-<section id="calculator" class="calculator-section">
-    <div class="section-container">
-        <div class="section-header">
-            <div class="section-eyebrow">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                    <line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="2"/>
-                </svg>
-                Carbon Calculator
+    <section id="calculator" class="calculator-section">
+        <div class="section-container">
+            <div class="section-header">
+                <div class="section-eyebrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                        <line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Carbon Calculator
+                </div>
+                <h2 class="section-title">Start Your Analysis</h2>
+                <p class="section-description">Complete assessment in 3 simple steps</p>
             </div>
-            <h2 class="section-title">Start Your Analysis</h2>
-            <p class="section-description">Complete assessment in 3 simple steps</p>
+
+            <div class="calculator-card">
+                <form id="calculator-form">
+                    <!-- Step 1: Scenario Selection -->
+                    <div class="form-section active" data-section="1">
+                        <div class="form-section-header">
+                            <h3 class="form-section-title">Select Scenario <span class="required-asterisk">*</span></h3>
+                            <p class="form-section-description">Choose the intervention strategy</p>
+                        </div>
+
+                        <div class="scenario-grid">
+                            <div class="scenario-card" data-scenario="light-renovation">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <h3>Light Renovation</h3>
+                                <p>Windows and insulation upgrades. High material reuse.</p>
+                            </div>
+
+                            <div class="scenario-card" data-scenario="deep-renovation">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <h3>Deep Renovation</h3>
+                                <p>Keep façade, rebuild interior. Balanced reuse.</p>
+                            </div>
+
+                            <div class="scenario-card" data-scenario="new-build">
+                                <div class="scenario-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h3>New Build</h3>
+                                <p>Complete reconstruction with modern standards.</p>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="selected-scenario" name="scenario" required>
+                    </div>
+
+                    <!-- Step 2: Building Data -->
+                    <div class="form-section" data-section="2">
+                        <div class="form-section-header">
+                            <h3 class="form-section-title">Building Data</h3>
+                            <p class="form-section-description">Enter key building characteristics</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="building-area">
+                                Building Area <span class="required-asterisk">*</span>
+                            </label>
+                            <span class="form-help">Total gross floor area (50–100,000 m²)</span>
+                            <div class="input-with-unit">
+                                <input 
+                                    type="number" 
+                                    id="building-area" 
+                                    name="buildingArea" 
+                                    class="form-input" 
+                                    placeholder="e.g., 1000" 
+                                    min="50" 
+                                    max="100000" 
+                                    step="1" 
+                                    required
+                                >
+                                <div class="input-unit">m²</div>
+                            </div>
+                            <span class="input-error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="lifespan">
+                                Expected Lifespan <span class="required-asterisk">*</span>
+                            </label>
+                            <span class="form-help">Operational lifespan after intervention (10–100 years)</span>
+                            <div class="input-with-unit">
+                                <input 
+                                    type="number" 
+                                    id="lifespan" 
+                                    name="lifespan" 
+                                    class="form-input" 
+                                    placeholder="e.g., 50" 
+                                    min="10" 
+                                    max="100" 
+                                    step="1" 
+                                    required
+                                >
+                                <div class="input-unit">years</div>
+                            </div>
+                            <span class="input-error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="structural-material">
+                                Structural Material <span class="required-asterisk">*</span>
+                            </label>
+                            <select id="structural-material" name="structuralMaterial" class="form-select" required>
+                                <option value="">Select material...</option>
+                                <option value="concrete">Concrete</option>
+                                <option value="steel">Steel</option>
+                                <option value="timber">Timber</option>
+                                <option value="masonry">Masonry</option>
+                                <option value="mixed">Mixed</option>
+                            </select>
+                            <span class="input-error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="climate-zone">
+                                Climate Zone <span class="required-asterisk">*</span>
+                            </label>
+                            <select id="climate-zone" name="climateZone" class="form-select" required>
+                                <option value="">Select climate...</option>
+                                <option value="cold">Cold</option>
+                                <option value="temperate">Temperate</option>
+                                <option value="warm">Warm</option>
+                                <option value="hot">Hot</option>
+                            </select>
+                            <span class="input-error-message"></span>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Energy Data -->
+                    <div class="form-section" data-section="3">
+                        <div class="form-section-header">
+                            <h3 class="form-section-title">Energy Data</h3>
+                            <p class="form-section-description">Provide energy performance</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="embodied-energy">
+                                Embodied Energy Factor <span class="required-asterisk">*</span>
+                            </label>
+                            <span class="form-help">Typical range: 200-800 kgCO₂/m²</span>
+                            <div class="input-with-unit">
+                                <input 
+                                    type="number" 
+                                    id="embodied-energy" 
+                                    name="embodiedEnergy" 
+                                    class="form-input" 
+                                    placeholder="e.g., 400" 
+                                    min="50" 
+                                    max="5000" 
+                                    step="1" 
+                                    required
+                                >
+                                <div class="input-unit">kgCO₂/m²</div>
+                            </div>
+                            <span class="input-error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="operational-energy">
+                                Operational Energy <span class="required-asterisk">*</span>
+                            </label>
+                            <span class="form-help">Annual consumption (10-500 kWh/m²/yr)</span>
+                            <div class="input-with-unit">
+                                <input 
+                                    type="number" 
+                                    id="operational-energy" 
+                                    name="operationalEnergy" 
+                                    class="form-input" 
+                                    placeholder="e.g., 150" 
+                                    min="10" 
+                                    max="500" 
+                                    step="1" 
+                                    required
+                                >
+                                <div class="input-unit">kWh/m²/yr</div>
+                            </div>
+                            <span class="input-error-message"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="reuse-rate">
+                                Material Reuse Rate (Optional)
+                            </label>
+                            <span class="form-help">Leave blank for scenario default (0-100%)</span>
+                            <div class="input-with-unit">
+                                <input 
+                                    type="number" 
+                                    id="reuse-rate" 
+                                    name="reuseRate" 
+                                    class="form-input" 
+                                    placeholder="e.g., 50" 
+                                    min="0" 
+                                    max="100" 
+                                    step="1"
+                                >
+                                <div class="input-unit">%</div>
+                            </div>
+                            <span class="input-error-message"></span>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-secondary" id="btn-back" style="display: none;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Back
+                        </button>
+                        <button type="button" class="btn btn-primary" id="btn-next">
+                            Next Step
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <div class="calculator-card">
-            <form id="calculator-form">
-                <!-- Step 1: Scenario Selection -->
-                <div class="form-section active" data-section="1">
-                    <div class="form-section-header">
-                        <h3 class="form-section-title">Select Scenario <span class="required-asterisk">*</span></h3>
-                        <p class="form-section-description">Choose the intervention strategy</p>
-                    </div>
-
-                    <div class="scenario-grid">
-                        <div class="scenario-card" data-scenario="light-renovation">
-                            <div class="scenario-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
-                                    <path d="M3 9H21" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                            </div>
-                            <h3>Light Renovation</h3>
-                            <p>Windows and insulation upgrades. High material reuse.</p>
-                        </div>
-
-                        <div class="scenario-card" data-scenario="deep-renovation">
-                            <div class="scenario-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="currentColor" stroke-width="2"/>
-                                </svg>
-                            </div>
-                            <h3>Deep Renovation</h3>
-                            <p>Keep façade, rebuild interior. Balanced reuse.</p>
-                        </div>
-
-                        <div class="scenario-card" data-scenario="new-build">
-                            <div class="scenario-icon">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </div>
-                            <h3>New Build</h3>
-                            <p>Complete reconstruction with modern standards.</p>
-                        </div>
-                    </div>
-
-                    <input type="hidden" id="selected-scenario" name="scenario" required>
-                </div>
-
-                <!-- Step 2: Building Data -->
-                <div class="form-section" data-section="2">
-                    <div class="form-section-header">
-                        <h3 class="form-section-title">Building Data</h3>
-                        <p class="form-section-description">Enter key building characteristics</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="building-area">
-                            Building Area <span class="required-asterisk">*</span>
-                        </label>
-                        <span class="form-help">Total gross floor area (50–100,000 m²)</span>
-                        <div class="input-with-unit">
-                            <input 
-                                type="number" 
-                                id="building-area" 
-                                name="buildingArea" 
-                                class="form-input" 
-                                placeholder="e.g., 1000" 
-                                min="50" 
-                                max="100000" 
-                                step="1" 
-                                required
-                            >
-                            <div class="input-unit">m²</div>
-                        </div>
-                        <span class="input-error-message"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="lifespan">
-                            Expected Lifespan <span class="required-asterisk">*</span>
-                        </label>
-                        <span class="form-help">Operational lifespan after intervention (10–100 years)</span>
-                        <div class="input-with-unit">
-                            <input 
-                                type="number" 
-                                id="lifespan" 
-                                name="lifespan" 
-                                class="form-input" 
-                                placeholder="e.g., 50" 
-                                min="10" 
-                                max="100" 
-                                step="1" 
-                                required
-                            >
-                            <div class="input-unit">years</div>
-                        </div>
-                        <span class="input-error-message"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="structural-material">
-                            Structural Material <span class="required-asterisk">*</span>
-                        </label>
-                        <select id="structural-material" name="structuralMaterial" class="form-select" required>
-                            <option value="">Select material...</option>
-                            <option value="concrete">Concrete</option>
-                            <option value="steel">Steel</option>
-                            <option value="timber">Timber</option>
-                            <option value="masonry">Masonry</option>
-                            <option value="mixed">Mixed</option>
-                        </select>
-                        <span class="input-error-message"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="climate-zone">
-                            Climate Zone <span class="required-asterisk">*</span>
-                        </label>
-                        <select id="climate-zone" name="climateZone" class="form-select" required>
-                            <option value="">Select climate...</option>
-                            <option value="cold">Cold</option>
-                            <option value="temperate">Temperate</option>
-                            <option value="warm">Warm</option>
-                            <option value="hot">Hot</option>
-                        </select>
-                        <span class="input-error-message"></span>
-                    </div>
-                </div>
-
-                <!-- Step 3: Energy Data -->
-                <div class="form-section" data-section="3">
-                    <div class="form-section-header">
-                        <h3 class="form-section-title">Energy Data</h3>
-                        <p class="form-section-description">Provide energy performance</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="embodied-energy">
-                            Embodied Energy Factor <span class="required-asterisk">*</span>
-                        </label>
-                        <span class="form-help">Typical range: 200-800 kgCO₂/m²</span>
-                        <div class="input-with-unit">
-                            <input 
-                                type="number" 
-                                id="embodied-energy" 
-                                name="embodiedEnergy" 
-                                class="form-input" 
-                                placeholder="e.g., 400" 
-                                min="50" 
-                                max="5000" 
-                                step="1" 
-                                required
-                            >
-                            <div class="input-unit">kgCO₂/m²</div>
-                        </div>
-                        <span class="input-error-message"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="operational-energy">
-                            Operational Energy <span class="required-asterisk">*</span>
-                        </label>
-                        <span class="form-help">Annual consumption (10-500 kWh/m²/yr)</span>
-                        <div class="input-with-unit">
-                            <input 
-                                type="number" 
-                                id="operational-energy" 
-                                name="operationalEnergy" 
-                                class="form-input" 
-                                placeholder="e.g., 150" 
-                                min="10" 
-                                max="500" 
-                                step="1" 
-                                required
-                            >
-                            <div class="input-unit">kWh/m²/yr</div>
-                        </div>
-                        <span class="input-error-message"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="reuse-rate">
-                            Material Reuse Rate (Optional)
-                        </label>
-                        <span class="form-help">Leave blank for scenario default (0-100%)</span>
-                        <div class="input-with-unit">
-                            <input 
-                                type="number" 
-                                id="reuse-rate" 
-                                name="reuseRate" 
-                                class="form-input" 
-                                placeholder="e.g., 50" 
-                                min="0" 
-                                max="100" 
-                                step="1"
-                            >
-                            <div class="input-unit">%</div>
-                        </div>
-                        <span class="input-error-message"></span>
-                    </div>
-                </div>
-
-                <!-- Navigation -->
-                <div class="form-navigation">
-                    <button type="button" class="btn btn-secondary" id="btn-back" style="display: none;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        Back
-                    </button>
-                    <button type="button" class="btn btn-primary" id="btn-next">
-                        Next Step
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</section>
+    </section>
 
     <!-- Results Section (COMPACT DESIGN) -->
     <section id="results" style="display: none;">
@@ -735,8 +780,9 @@
         </div>
     </section>
 
+
     <!-- About Section -->
-    <section id="about" class="problem-section">
+    <section id="about" class="features-section">
         <div class="section-container">
             <div class="section-header">
                 <div class="section-eyebrow">
@@ -751,11 +797,108 @@
 
             <div style="max-width: 800px; margin: 4rem auto 0; background: white; padding: 3rem; border-radius: 12px; border: 1px solid var(--border);">
                 <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text); margin-bottom: 2rem;">
-                    This tool was developed as part of a master's thesis examining the carbon implications of building renovation versus demolition decisions. The framework synthesizes current research in lifecycle assessment and provides practitioners with accessible, evidence-based guidance.
+                    This tool was developed as part of a master's thesis examining the carbon implications of building renovation versus demolition decisions. The framework synthesizes current research in lifecycle assessment and provides practitioners with accessible, evidence-based guidance for achieving Net Zero 2050 goals in the built environment.
                 </p>
-                <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text);">
-                    <strong>Credits:</strong> Research and methodology by Valentine Lhoest. Technical implementation by João Santos Alfar. Thesis defense: May 15, 2026.
+                <p style="font-size: 1.1rem; line-height: 1.8; color: var(--text); margin-bottom: 1rem;">
+                    <strong>Research & Methodology:</strong> Valentine Lhoest<br>
+                    <strong>Technical Implementation:</strong> João Alfar<br>
+                    <strong>Thesis Defense:</strong> May 15, 2026
                 </p>
+                <p style="font-size: 1rem; line-height: 1.6; color: var(--text-light);">
+                    For inquiries or collaboration opportunities, please contact: <a href="mailto:valentine.lhoest1@gmail.com" style="color: var(--primary); text-decoration: none; font-weight: 600;">valentine.lhoest1@gmail.com</a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+  <!-- FAQ SECTION (NEW) -->
+    <section id="faq" class="problem-section">
+        <div class="section-container">
+            <div class="section-header">
+                <div class="section-eyebrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 17H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Common Questions
+                </div>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-description">Everything you need to know about using the carbon calculator</p>
+            </div>
+
+            <div class="faq-container">
+                <details class="faq-item">
+                    <summary class="faq-question">
+                        <span>What is embodied carbon?</span>
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </summary>
+                    <div class="faq-answer">
+                        <p>Embodied carbon refers to the total greenhouse gas emissions generated during the extraction, manufacturing, transportation, and construction of building materials and components. This "upfront" carbon represents approximately 11% of global CO₂ emissions and is critical in renovation versus demolition decisions because it accounts for all the carbon already "locked" into existing structures.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-question">
+                        <span>What is operational carbon?</span>
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </summary>
+                    <div class="faq-answer">
+                        <p>Operational carbon encompasses emissions produced during a building's use phase — primarily from heating, cooling, lighting, and appliances. While renewable energy can theoretically reduce operational carbon to zero, it currently represents about 28% of global emissions. Our calculator evaluates how different intervention strategies affect long-term operational efficiency over the building's expected lifespan.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-question">
+                        <span>When should I renovate instead of rebuilding?</span>
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </summary>
+                    <div class="faq-answer">
+                        <p>Renovation is typically preferable when the existing structure has substantial reusable material (high structural integrity), when operational improvements can be achieved through targeted upgrades (insulation, windows, systems), and when the building has a remaining lifespan of 30+ years. Our tool quantifies these trade-offs by comparing whole-life carbon across scenarios, accounting for material reuse rates, operational efficiency gains, climate context, and building lifespan.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-question">
+                        <span>How accurate are the results?</span>
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </summary>
+                    <div class="faq-answer">
+                        <p>This calculator provides indicative results based on research-backed assumptions and industry-standard LCA methodologies. Accuracy depends on input quality and project-specific factors not captured by simplified models. Results should be used for preliminary decision-making and comparative analysis. For regulatory compliance or investment decisions, we recommend conducting a detailed project-specific Life Cycle Assessment (LCA) according to EN 15978 or ISO 14040/14044 standards.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-question">
+                        <span>Who should use this tool?</span>
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </summary>
+                    <div class="faq-answer">
+                        <p>This tool is designed for architects, engineers, sustainability consultants, property developers, facility managers, and policymakers evaluating building intervention strategies. It's particularly useful during early-stage feasibility studies, strategic planning, and stakeholder communication. The framework supports evidence-based decision-making aligned with Net Zero 2050 targets and circular economy principles in the built environment.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary class="faq-question">
+                        <span>What data do I need to use the calculator?</span>
+                        <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </summary>
+                    <div class="faq-answer">
+                        <p>You'll need basic building parameters: gross floor area (m²), expected lifespan post-intervention (years), structural material type (concrete, steel, timber, masonry, or mixed), climate zone (cold, temperate, warm, or hot), embodied energy factor (typical range: 200–800 kgCO₂/m²), and operational energy consumption (10–500 kWh/m²/yr). Optional: material reuse rate percentage. The calculator provides scenario defaults based on typical renovation depths (light, deep) versus new construction.</p>
+                    </div>
+                </details>
             </div>
         </div>
     </section>
@@ -779,6 +922,7 @@
                 <ul>
                     <li><a href="#calculator">Calculator</a></li>
                     <li><a href="#methodology">Methodology</a></li>
+                    <li><a href="#faq">FAQ</a></li>
                     <li><a href="#about">About</a></li>
                 </ul>
             </div>
@@ -786,23 +930,23 @@
             <div class="footer-column">
                 <h4>Resources</h4>
                 <ul>
-                    <li><a href="#">Documentation</a></li>
-                    <li><a href="#">Research</a></li>
-                    <li><a href="#">FAQ</a></li>
+                    <li><a href="https://github.com/alfarjoao/sustainability-framework" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                    <li><a href="https://sustainability-framework.vercel.app" target="_blank" rel="noopener noreferrer">Live Demo</a></li>
+                    <li><a href="#methodology">Documentation</a></li>
                 </ul>
             </div>
 
             <div class="footer-column">
                 <h4>Contact</h4>
                 <ul>
-                    <li><a href="mailto:info@sustainabuild.com">Email</a></li>
-                    <li><a href="#">GitHub</a></li>
+                    <li><a href="mailto:valentine.lhoest1@gmail.com">Email</a></li>
+                    <li><a href="https://github.com/alfarjoao/sustainability-framework" target="_blank" rel="noopener noreferrer">GitHub</a></li>
                 </ul>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <p>&copy; 2026 Building Sustainability Decision Framework. All rights reserved.</p>
+            <p>&copy; 2026 SustainaBuild. Research by Valentine Lhoest | Development by João Alfar</p>
         </div>
     </footer>
 
