@@ -426,51 +426,118 @@
         </div>
     </section>
 
-    <!-- RESULTS SECTION -->
-    <section id="results" class="results-section">
-        <div class="section-container">
-            <div class="section-header">
-                <div class="section-eyebrow">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Analysis Complete
+    <!-- Results Section -->
+<section id="results" style="display: none;">
+    <div class="container">
+        <div class="results-header">
+            <div class="decision-badge" id="decisionBadge">
+                <span class="decision-icon">✓</span>
+                <span class="decision-text" id="decisionText">RENOVATE</span>
+            </div>
+            <h2 id="resultsTitle">Renovation is the better choice</h2>
+            <p class="results-subtitle" id="resultsSubtitle">
+                Renovating this building will save <strong id="savingsAmount">5,700 tCO₂e</strong> 
+                (<strong id="savingsPercent">31%</strong>) compared to demolishing and rebuilding.
+            </p>
+        </div>
+
+        <!-- Carbon Comparison Cards -->
+        <div class="results-cards">
+            <div class="result-card result-card-renovation">
+                <div class="result-card-header">
+                    <span class="result-icon">♻️</span>
+                    <h3>Renovation</h3>
                 </div>
-                <h2 class="section-title">Your Results</h2>
+                <div class="result-value">
+                    <span class="result-number" id="renovationTotal">12,500</span>
+                    <span class="result-unit">tCO₂e</span>
+                </div>
+                <div class="result-breakdown">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Embodied:</span>
+                        <span class="breakdown-value" id="renovationEmbodied">2,500</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Operational:</span>
+                        <span class="breakdown-value" id="renovationOperational">10,000</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="decision-card">
-                <div class="decision-badge" id="decision-badge">RENOVATE</div>
-                <h2 class="decision-title" id="decision-title">Renovation is Recommended</h2>
-                <p class="decision-subtitle" id="decision-subtitle">Based on whole-life carbon analysis, renovation offers a lower carbon footprint over the building's lifespan.</p>
-            </div>
-
-            <div class="carbon-comparison">
-                <div class="carbon-card">
-                    <div class="carbon-card-label">Renovation Carbon</div>
-                    <div class="carbon-card-value" id="renovation-carbon">12,500</div>
-                    <div class="carbon-card-unit">tCO₂e</div>
+            <div class="result-card result-card-newbuild">
+                <div class="result-card-header">
+                    <span class="result-icon">🏗️</span>
+                    <h3>New Build</h3>
                 </div>
-
-                <div class="carbon-card">
-                    <div class="carbon-card-label">New Build Carbon</div>
-                    <div class="carbon-card-value" id="newbuild-carbon">18,200</div>
-                    <div class="carbon-card-unit">tCO₂e</div>
+                <div class="result-value">
+                    <span class="result-number" id="newbuildTotal">18,200</span>
+                    <span class="result-unit">tCO₂e</span>
                 </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 3rem;">
-                <button class="btn btn-primary" onclick="window.location.reload()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 4V10H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M20.49 9C19.9828 7.56678 19.1209 6.28536 17.9845 5.27542C16.8482 4.26548 15.4745 3.55976 13.9917 3.22426C12.5089 2.88875 10.9652 2.93434 9.50481 3.35677C8.04437 3.77921 6.71475 4.56471 5.64 5.64L1 10M23 14L18.36 18.36C17.2853 19.4353 15.9556 20.2208 14.4952 20.6432C13.0348 21.0657 11.4911 21.1112 10.0083 20.7757C8.52547 20.4402 7.1518 19.7345 6.01547 18.7246C4.87913 17.7146 4.01717 16.4332 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    New Analysis
-                </button>
+                <div class="result-breakdown">
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Embodied:</span>
+                        <span class="breakdown-value" id="newbuildEmbodied">8,200</span>
+                    </div>
+                    <div class="breakdown-item">
+                        <span class="breakdown-label">Operational:</span>
+                        <span class="breakdown-value" id="newbuildOperational">10,000</span>
+                    </div>
+                </div>
             </div>
         </div>
-    </section>
+
+        <!-- Visualizations Grid -->
+        <div class="charts-grid">
+            <!-- Bar Chart -->
+            <div class="chart-container">
+                <h3 class="chart-title">Carbon Comparison</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="chart-container">
+                <h3 class="chart-title">Carbon Breakdown</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+
+            <!-- Line Chart -->
+            <div class="chart-container chart-container-wide">
+                <h3 class="chart-title">Lifecycle Carbon Timeline</h3>
+                <canvas id="lineChart"></canvas>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="chart-container chart-container-wide">
+                <h3 class="chart-title">Scenario Comparison</h3>
+                <div class="comparison-table-wrapper">
+                    <table class="comparison-table" id="comparisonTable">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Light Renovation</th>
+                                <th>Deep Renovation</th>
+                                <th>New Build</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="results-actions">
+            <button class="btn btn-primary" onclick="window.calculatorDebug.exportPDF()">
+                <span>📄</span> Download PDF Report
+            </button>
+            <button class="btn btn-secondary" onclick="location.reload()">
+                <span>🔄</span> Start New Analysis
+            </button>
+        </div>
+    </div>
+</section>
 
     <!-- Methodology Section -->
     <section id="methodology" class="features-section">
@@ -567,6 +634,9 @@
             <p>&copy; 2026 Building Sustainability Decision Framework. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
     <script src="js/calculator.js"></script>
 </body>

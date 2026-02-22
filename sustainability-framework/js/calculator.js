@@ -327,75 +327,113 @@ function performCalculation() {
     const savings = Math.abs(renovationTotal - newBuildTotal);
     const savingsPercentage = ((savings / Math.max(renovationTotal, newBuildTotal)) * 100).toFixed(1);
 
-    // Display results with animation
-    displayResults({
+    // Prepare results object for charts
+    const results = {
         decision: decision,
-        renovationTotal: renovationTotal,
-        newBuildTotal: newBuildTotal,
-        savings: savings,
-        savingsPercentage: savingsPercentage,
-        scenario: scenario
-    });
+        savings: Math.round(savings),
+        savingsPercent: savingsPercentage,
+        renovation: {
+            totalCarbon: Math.round(renovationTotal),
+            embodiedCarbon: Math.round(renovationEmbodied),
+            operationalCarbon: Math.round(renovationOperational)
+        },
+        newBuild: {
+            totalCarbon: Math.round(newBuildTotal),
+            embodiedCarbon: Math.round(newBuildEmbodied),
+            operationalCarbon: Math.round(newBuildOperational)
+        },
+        inputs: {
+            scenario: scenario,
+            buildingArea: area,
+            lifespan: lifespan,
+            embodiedEnergy: embodiedEnergy,
+            operationalEnergy: operationalEnergy,
+            material: material,
+            climate: climate,
+            reuseRate: reuseRate * 100
+        }
+    };
+
+    // Display results with animation
+    displayResults(results);
 }
 
 /* ========================================
    DISPLAY RESULTS WITH ANIMATIONS
    ======================================== */
 function displayResults(results) {
-    // Update decision card
-    const decisionBadge = document.getElementById('decision-badge');
-    const decisionTitle = document.getElementById('decision-title');
-    const decisionSubtitle = document.getElementById('decision-subtitle');
+    console.log('📊 Displaying results:', results);
+
+    // Update decision badge
+    const decisionBadge = document.getElementById('decisionBadge');
+    const decisionText = document.getElementById('decisionText');
+    const resultsTitle = document.getElementById('resultsTitle');
+    const resultsSubtitle = document.getElementById('resultsSubtitle');
 
     if (results.decision === 'RENOVATE') {
-        decisionBadge.textContent = 'RENOVATE';
-        decisionBadge.style.background = 'var(--primary)';
-        decisionTitle.textContent = 'Renovation is Recommended';
-        decisionSubtitle.textContent = `Based on whole-life carbon analysis, renovation offers ${results.savingsPercentage}% lower carbon footprint over the building's lifespan, saving approximately ${formatNumber(results.savings)} tCO₂e.`;
+        decisionBadge.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-light))';
+        decisionText.textContent = 'RENOVATE';
+        resultsTitle.textContent = 'Renovation is the better choice';
     } else {
-        decisionBadge.textContent = 'DEMOLISH & NEW BUILD';
-        decisionBadge.style.background = 'var(--secondary)';
-        decisionTitle.textContent = 'New Build is Recommended';
-        decisionSubtitle.textContent = `Based on whole-life carbon analysis, demolition and reconstruction offers ${results.savingsPercentage}% lower carbon footprint over the building's lifespan, saving approximately ${formatNumber(results.savings)} tCO₂e.`;
+        decisionBadge.style.background = 'linear-gradient(135deg, var(--accent), #ef4444)';
+        decisionText.textContent = 'DEMOLISH & REBUILD';
+        resultsTitle.textContent = 'New build is recommended';
     }
 
-    // Animate number counting
-    animateValue('renovation-carbon', 0, results.renovationTotal, 1000);
-    animateValue('newbuild-carbon', 0, results.newBuildTotal, 1000);
+    // Update subtitle with savings
+    const savingsAmount = document.getElementById('savingsAmount');
+    const savingsPercent = document.getElementById('savingsPercent');
+    savingsAmount.textContent = formatNumber(results.savings) + ' tCO₂e';
+    savingsPercent.textContent = results.savingsPercent + '%';
+
+    resultsSubtitle.innerHTML = results.decision === 'RENOVATE'
+        ? `Renovating this building will save <strong>${formatNumber(results.savings)} tCO₂e</strong> (<strong>${results.savingsPercent}%</strong>) compared to demolishing and rebuilding.`
+        : `A new build will save <strong>${formatNumber(results.savings)} tCO₂e</strong> (<strong>${results.savingsPercent}%</strong>) compared to renovation.`;
+
+    // Update carbon values with animation
+    animateNumber('renovationTotal', 0, results.renovation.totalCarbon, 1500);
+    animateNumber('renovationEmbodied', 0, results.renovation.embodiedCarbon, 1500);
+    animateNumber('renovationOperational', 0, results.renovation.operationalCarbon, 1500);
+    
+    animateNumber('newbuildTotal', 0, results.newBuild.totalCarbon, 1500);
+    animateNumber('newbuildEmbodied', 0, results.newBuild.embodiedCarbon, 1500);
+    animateNumber('newbuildOperational', 0, results.newBuild.operationalCarbon, 1500);
+
+    // Initialize charts
+    if (window.ChartsModule) {
+        setTimeout(() => {
+            window.ChartsModule.init(results);
+        }, 800);
+    }
 
     // Show results section with fade-in
+    const resultsSection = document.getElementById('results');
+    resultsSection.style.display = 'block';
     resultsSection.style.opacity = '0';
-    resultsSection.style.transform = 'translateY(30px)';
-    resultsSection.classList.add('show');
     
     setTimeout(() => {
-        resultsSection.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        resultsSection.style.transition = 'opacity 0.6s ease';
         resultsSection.style.opacity = '1';
-        resultsSection.style.transform = 'translateY(0)';
-    }, 100);
-
-    // Smooth scroll to results
-    setTimeout(() => {
+        
+        // Smooth scroll to results
         resultsSection.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
+            behavior: 'smooth', 
+            block: 'start' 
         });
-    }, 300);
+    }, 100);
 }
 
 /* ========================================
    HELPER FUNCTIONS
    ======================================== */
 function formatNumber(num) {
-    const tons = num / 1000;
-    return tons.toLocaleString('en-US', {
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1
-    });
+    return Math.round(num).toLocaleString('en-US');
 }
 
-function animateValue(elementId, start, end, duration) {
+function animateNumber(elementId, start, end, duration) {
     const element = document.getElementById(elementId);
+    if (!element) return;
+    
     const startTime = performance.now();
     
     function update(currentTime) {
@@ -473,7 +511,10 @@ document.head.appendChild(animationStyles);
 window.calculatorDebug = {
     formData: formData,
     scenarioDefaults: scenarioDefaults,
-    currentStep: () => currentStep
+    currentStep: () => currentStep,
+    exportPDF: function() {
+        alert('PDF export feature coming soon!');
+    }
 };
 
 console.log('✨ Calculator initialized with smooth animations');
