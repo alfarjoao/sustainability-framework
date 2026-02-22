@@ -5,7 +5,7 @@
 
 // State Management
 let currentStep = 1;
-const totalSteps = 2; // APENAS 2 STEPS AGORA
+const totalSteps = 2;
 let formData = {};
 
 // 6 CENÁRIOS COM VALORES PLACEHOLDER (Valentine vai fornecer os reais)
@@ -71,15 +71,6 @@ const climateMultipliers = {
     'hot': 1.1
 };
 
-// Validation Rules
-const validationRules = {
-    'buildingArea': { min: 50, max: 100000, message: 'Area must be between 50 and 100,000 m²' },
-    'lifespan': { min: 10, max: 100, message: 'Lifespan must be between 10 and 100 years' },
-    'embodiedEnergy': { min: 50, max: 5000, message: 'Embodied energy must be between 50 and 5,000 kgCO₂/m²' },
-    'operationalEnergy': { min: 10, max: 500, message: 'Operational energy must be between 10 and 500 kWh/m²/yr' },
-    'reuseRate': { min: 0, max: 100, message: 'Reuse rate must be between 0 and 100%' }
-};
-
 // DOM Elements
 const form = document.getElementById('calculator-form');
 const btnNext = document.getElementById('btn-next');
@@ -102,42 +93,44 @@ function setupEventListeners() {
     btnNext.addEventListener('click', handleNext);
     btnBack.addEventListener('click', handleBack);
 
-    // Real-time validation on inputs
-    const inputs = form.querySelectorAll('input[type="number"], select');
+    // Real-time validation on ALL inputs (dropdowns + number fields)
+    const inputs = form.querySelectorAll('input, select');
     inputs.forEach(input => {
         // Validate on blur (when user leaves field)
         input.addEventListener('blur', function() {
             validateInput(this);
         });
         
-        // Validate on input (while typing)
-        input.addEventListener('input', function() {
+        // Validate on change (for dropdowns)
+        input.addEventListener('change', function() {
+            validateInput(this);
             if (this.value) {
-                validateInput(this);
+                formData[this.name] = this.value;
             }
         });
         
-        // Store data on change
-        input.addEventListener('change', function() {
+        // Validate on input (for text/number inputs while typing)
+        input.addEventListener('input', function() {
             if (this.value) {
-                formData[this.name] = this.value;
+                validateInput(this);
             }
         });
     });
 }
 
 /* ========================================
-   REAL-TIME VALIDATION
+   REAL-TIME VALIDATION (SIMPLIFIED - NO MIN/MAX)
    ======================================== */
 function validateInput(input) {
-    const name = input.name;
-    const value = parseFloat(input.value);
     const parentGroup = input.closest('.form-group');
     const errorMessage = parentGroup ? parentGroup.querySelector('.input-error-message') : null;
     
     // Clear previous state
     input.classList.remove('input-valid', 'input-invalid');
-    if (errorMessage) errorMessage.textContent = '';
+    if (errorMessage) {
+        errorMessage.textContent = '';
+        errorMessage.style.display = 'none';
+    }
     
     // Check if required and empty
     if (input.hasAttribute('required') && !input.value.trim()) {
@@ -147,29 +140,6 @@ function validateInput(input) {
             errorMessage.style.display = 'block';
         }
         return false;
-    }
-    
-    // Check against validation rules
-    if (validationRules[name] && input.value) {
-        const rule = validationRules[name];
-        
-        if (isNaN(value)) {
-            input.classList.add('input-invalid');
-            if (errorMessage) {
-                errorMessage.textContent = 'Please enter a valid number';
-                errorMessage.style.display = 'block';
-            }
-            return false;
-        }
-        
-        if (value < rule.min || value > rule.max) {
-            input.classList.add('input-invalid');
-            if (errorMessage) {
-                errorMessage.textContent = rule.message;
-                errorMessage.style.display = 'block';
-            }
-            return false;
-        }
     }
     
     // Validation passed
@@ -373,14 +343,14 @@ function calculateResults() {
 }
 
 function performCalculation() {
-    // Get form data
+    // Get form data (agora todos são valores diretos de dropdowns)
     const area = parseFloat(formData.buildingArea);
     const lifespan = parseFloat(formData.lifespan);
     const embodiedEnergy = parseFloat(formData.embodiedEnergy);
     const operationalEnergy = parseFloat(formData.operationalEnergy);
     const material = formData.structuralMaterial;
     const climate = formData.climateZone;
-    const userReuseRate = parseFloat(formData.reuseRate) / 100; // Convert to decimal
+    const userReuseRate = parseFloat(formData.reuseRate) / 100; // Convert % to decimal
 
     // Get multipliers
     const materialFactor = materialFactors[material] || 1.0;
@@ -392,8 +362,8 @@ function performCalculation() {
     Object.keys(scenarioDefaults).forEach(scenarioKey => {
         const scenario = scenarioDefaults[scenarioKey];
         
-        // Use user's reuse rate OR scenario default
-        const reuseRate = userReuseRate; // Sempre usa o input do utilizador
+        // Use user's reuse rate
+        const reuseRate = userReuseRate;
         const embodiedFactor = scenario.embodiedFactor;
         const operationalImprovement = scenario.operationalImprovement;
 
@@ -538,6 +508,15 @@ function displayResults(results) {
             block: 'start' 
         });
     }, 100);
+
+    // Re-enable button
+    btnNext.disabled = false;
+    btnNext.innerHTML = `
+        Calculate Results
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    `;
 }
 
 /* ========================================
@@ -643,7 +622,7 @@ animationStyles.textContent = `
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    /* Input States */
+    /* Input States - UPDATED FOR DROPDOWNS */
     .form-input.input-valid,
     .form-select.input-valid {
         border-color: #10b981 !important;
@@ -715,4 +694,4 @@ window.calculatorDebug = {
     validate: () => validateCurrentStep()
 };
 
-console.log('✨ Calculator initialized with 6-scenario comparison logic');
+console.log('✨ Calculator initialized with 6-scenario comparison logic + DROPDOWNS');
