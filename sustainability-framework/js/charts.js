@@ -1,7 +1,7 @@
 /* ========================================
    BUILDING SUSTAINABILITY FRAMEWORK
    Charts Module - 7 Scenarios Visualization
-   VERSÃO COM DEBUG COMPLETO
+   VERSÃO CORRIGIDA PARA VERCEL
    ======================================== */
 
 const ChartsModule = (function() {
@@ -18,32 +18,14 @@ const ChartsModule = (function() {
     }
 
     function init(data) {
-        console.log('📊 ========================================');
-        console.log('📊 ChartsModule.init() called');
-        console.log('📊 Received data:', data);
+        console.log('📊 ChartsModule.init() called with data:', data);
         
-        if (!data) {
-            console.error('❌ No data provided to ChartsModule.init()');
+        if (!data || !data.allScenarios || !Array.isArray(data.allScenarios)) {
+            console.error('❌ Invalid data structure:', data);
             return;
         }
         
-        if (!data.allScenarios) {
-            console.error('❌ data.allScenarios is missing!', data);
-            return;
-        }
-        
-        if (!Array.isArray(data.allScenarios)) {
-            console.error('❌ data.allScenarios is not an array!', typeof data.allScenarios, data.allScenarios);
-            return;
-        }
-        
-        if (data.allScenarios.length === 0) {
-            console.error('❌ data.allScenarios is empty!');
-            return;
-        }
-        
-        console.log('✅ Data validation passed');
-        console.log('✅ Number of scenarios:', data.allScenarios.length);
+        console.log('✅ Data validation passed. Scenarios:', data.allScenarios.length);
         
         resultsData = data;
         
@@ -52,28 +34,26 @@ const ChartsModule = (function() {
         
         // Create new charts with delay
         setTimeout(() => {
-            console.log('📊 Starting chart creation...');
+            console.log('📊 Creating charts...');
             createBarChart();
             createPieChart();
             createLineChart();
             createComparisonTable();
-            console.log('📊 ========================================');
         }, 300);
     }
 
     function destroyCharts() {
-        console.log('🗑️ Destroying existing charts...');
         if (barChart) {
             barChart.destroy();
-            console.log('  ✓ Bar chart destroyed');
+            barChart = null;
         }
         if (pieChart) {
             pieChart.destroy();
-            console.log('  ✓ Pie chart destroyed');
+            pieChart = null;
         }
         if (lineChart) {
             lineChart.destroy();
-            console.log('  ✓ Line chart destroyed');
+            lineChart = null;
         }
     }
 
@@ -81,42 +61,23 @@ const ChartsModule = (function() {
        BAR CHART - 7 SCENARIOS COMPARISON
        ======================================== */
     function createBarChart() {
-        console.log('📊 Creating BAR CHART...');
-        
         const ctx = document.getElementById('barChart');
         
-        if (!ctx) {
-            console.error('❌ Canvas element #barChart NOT FOUND in DOM!');
-            console.log('Available canvas elements:', document.querySelectorAll('canvas'));
-            return;
-        }
-        
-        console.log('✅ Canvas #barChart found:', ctx);
-        
-        if (!resultsData || !resultsData.allScenarios) {
-            console.error('❌ resultsData or allScenarios missing');
+        if (!ctx || !resultsData) {
+            console.error('❌ Bar chart: Missing canvas or data');
             return;
         }
 
         const scenarios = resultsData.allScenarios;
-        console.log('📊 Processing', scenarios.length, 'scenarios for bar chart');
         
-        // Sort scenarios by total carbon
         const sortedScenarios = scenarios.slice().sort((a, b) => 
             a.totalCarbon - b.totalCarbon
         );
-        
-        console.log('📊 Sorted scenarios:', sortedScenarios.map(s => s.displayName));
 
         const labels = sortedScenarios.map(s => s.displayName);
         const embodiedData = sortedScenarios.map(s => s.embodiedCarbon);
         const operationalData = sortedScenarios.map(s => s.operationalCarbon);
         
-        console.log('📊 Labels:', labels);
-        console.log('📊 Embodied data:', embodiedData);
-        console.log('📊 Operational data:', operationalData);
-        
-        // Colors
         const colors = sortedScenarios.map(s => 
             s.category === 'renovation' ? 'rgba(16, 185, 129, 0.8)' : 'rgba(14, 165, 233, 0.8)'
         );
@@ -150,7 +111,7 @@ const ChartsModule = (function() {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,  // ✅ CORRIGIDO
                     interaction: {
                         mode: 'index',
                         intersect: false,
@@ -228,7 +189,7 @@ const ChartsModule = (function() {
                 }
             });
             
-            console.log('✅ BAR CHART created successfully!', barChart);
+            console.log('✅ BAR CHART created');
             
         } catch (error) {
             console.error('❌ Error creating bar chart:', error);
@@ -239,19 +200,10 @@ const ChartsModule = (function() {
        PIE CHART - BREAKDOWN (BEST SCENARIOS)
        ======================================== */
     function createPieChart() {
-        console.log('📊 Creating PIE CHART...');
-        
         const ctx = document.getElementById('pieChart');
         
-        if (!ctx) {
-            console.error('❌ Canvas element #pieChart NOT FOUND in DOM!');
-            return;
-        }
-        
-        console.log('✅ Canvas #pieChart found:', ctx);
-        
-        if (!resultsData) {
-            console.error('❌ resultsData missing');
+        if (!ctx || !resultsData) {
+            console.error('❌ Pie chart: Missing canvas or data');
             return;
         }
 
@@ -259,12 +211,9 @@ const ChartsModule = (function() {
         const bestNewbuild = resultsData.bestNewbuild;
         
         if (!bestRenovation || !bestNewbuild) {
-            console.error('❌ Missing best scenarios:', {bestRenovation, bestNewbuild});
+            console.error('❌ Missing best scenarios');
             return;
         }
-
-        console.log('✅ Best renovation:', bestRenovation.displayName);
-        console.log('✅ Best newbuild:', bestNewbuild.displayName);
 
         try {
             pieChart = new Chart(ctx, {
@@ -296,7 +245,7 @@ const ChartsModule = (function() {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,  // ✅ CORRIGIDO
                     plugins: {
                         title: {
                             display: true,
@@ -335,7 +284,7 @@ const ChartsModule = (function() {
                 }
             });
             
-            console.log('✅ PIE CHART created successfully!', pieChart);
+            console.log('✅ PIE CHART created');
             
         } catch (error) {
             console.error('❌ Error creating pie chart:', error);
@@ -346,30 +295,19 @@ const ChartsModule = (function() {
        LINE CHART - TIMELINE (CUMULATIVE)
        ======================================== */
     function createLineChart() {
-        console.log('📊 Creating LINE CHART...');
-        
         const ctx = document.getElementById('lineChart');
         
-        if (!ctx) {
-            console.error('❌ Canvas element #lineChart NOT FOUND in DOM!');
-            return;
-        }
-        
-        console.log('✅ Canvas #lineChart found:', ctx);
-        
-        if (!resultsData || !resultsData.allScenarios || !resultsData.inputs) {
-            console.error('❌ resultsData incomplete');
+        if (!ctx || !resultsData) {
+            console.error('❌ Line chart: Missing canvas or data');
             return;
         }
 
         const scenarios = resultsData.allScenarios;
         const lifespan = resultsData.inputs.lifespan;
         
-        console.log('✅ Creating timeline for', lifespan, 'years');
-        
         const years = Array.from({ length: Math.min(lifespan + 1, 101) }, (_, i) => i);
         
-        const datasets = scenarios.map((scenario, index) => {
+        const datasets = scenarios.map((scenario) => {
             const embodied = scenario.embodiedCarbon;
             const operationalPerYear = scenario.operationalCarbon / lifespan;
             
@@ -407,8 +345,6 @@ const ChartsModule = (function() {
             };
         });
 
-        console.log('✅ Created', datasets.length, 'datasets for line chart');
-
         try {
             lineChart = new Chart(ctx, {
                 type: 'line',
@@ -418,7 +354,7 @@ const ChartsModule = (function() {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,  // ✅ CORRIGIDO
                     interaction: {
                         mode: 'index',
                         intersect: false,
@@ -497,7 +433,7 @@ const ChartsModule = (function() {
                 }
             });
             
-            console.log('✅ LINE CHART created successfully!', lineChart);
+            console.log('✅ LINE CHART created');
             
         } catch (error) {
             console.error('❌ Error creating line chart:', error);
@@ -508,34 +444,23 @@ const ChartsModule = (function() {
        COMPARISON TABLE - 7 SCENARIOS
        ======================================== */
     function createComparisonTable() {
-        console.log('📊 Creating COMPARISON TABLE...');
-        
         const table = document.getElementById('comparisonTable');
         
-        if (!table) {
-            console.error('❌ Table element #comparisonTable NOT FOUND in DOM!');
+        if (!table || !resultsData) {
+            console.error('❌ Table: Missing element or data');
             return;
         }
-        
-        console.log('✅ Table #comparisonTable found:', table);
-        
+
         const tbody = table.querySelector('tbody');
         
         if (!tbody) {
-            console.error('❌ Table tbody NOT FOUND!');
+            console.error('❌ Table: Missing tbody');
             return;
         }
         
         tbody.innerHTML = '';
 
-        if (!resultsData || !resultsData.allScenarios) {
-            console.error('❌ resultsData or allScenarios missing');
-            return;
-        }
-
         const scenarios = resultsData.allScenarios;
-        
-        console.log('✅ Creating table for', scenarios.length, 'scenarios');
         
         const bestEmbodied = Math.min(...scenarios.map(s => s.embodiedCarbon));
         const bestOperational = Math.min(...scenarios.map(s => s.operationalCarbon));
@@ -593,7 +518,7 @@ const ChartsModule = (function() {
         `;
         tbody.appendChild(categoryRow);
         
-        console.log('✅ TABLE created successfully with 4 rows and', scenarios.length, 'columns');
+        console.log('✅ TABLE created with', scenarios.length, 'scenarios');
     }
 
     /* ========================================
@@ -608,4 +533,4 @@ const ChartsModule = (function() {
 // Expose to global scope
 window.ChartsModule = ChartsModule;
 
-console.log('✨ Charts module loaded with FULL DEBUG (7 scenarios support)');
+console.log('✨ Charts module loaded (7 scenarios, Vercel-optimized)');
