@@ -549,7 +549,7 @@ nav {
 }
 
 /* ========================================
-   CALCULATOR SECTION
+   CALCULATOR SECTION - 4 PASSOS
    ======================================== */
 .calculator-card {
     background: white;
@@ -561,12 +561,104 @@ nav {
     box-shadow: 0 20px 60px rgba(0,0,0,0.08);
 }
 
+/* ✅ PROGRESS BAR - 4 STEPS */
+.progress-bar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 700px;
+    margin: 0 auto 4rem;
+    position: relative;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    flex: 1;
+    z-index: 2;
+}
+
+/* ✅ Linha conectora SEMPRE VISÍVEL */
+.progress-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    width: calc(100% + 20px);
+    height: 3px;
+    background: linear-gradient(90deg, #e5e7eb 0%, #e5e7eb 100%);
+    z-index: -1;
+    transition: background 0.3s ease;
+}
+
+.progress-step.active:not(:last-child)::after,
+.progress-step.completed:not(:last-child)::after {
+    background: linear-gradient(90deg, #10b981 0%, #10b981 100%);
+}
+
+.step-number {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid #e5e7eb;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #9ca3af;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 3;
+}
+
+.progress-step.active .step-number,
+.progress-step.completed .step-number {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transform: scale(1.1);
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-align: center;
+    transition: color 0.3s ease;
+    max-width: 120px;
+}
+
+.progress-step.active .step-label,
+.progress-step.completed .step-label {
+    color: #047857;
+    font-weight: 700;
+}
+
+/* Form Sections */
 .form-section {
     display: none;
 }
 
 .form-section.active {
     display: block;
+    animation: fadeInSlide 0.4s ease;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .form-section-header {
@@ -638,6 +730,8 @@ nav {
     margin-top: 3rem;
     padding-top: 2rem;
     border-top: 2px solid var(--border);
+    z-index: 1;
+    position: relative;
 }
 
 .btn {
@@ -665,11 +759,13 @@ nav {
 }
 
 /* ========================================
-   CUSTOM MATERIAL DROPDOWN COM CHECKBOXES
+   ✅ CUSTOM MATERIAL DROPDOWN - FINAL FIX
    ======================================== */
+
 .custom-multiselect {
     position: relative;
     width: 100%;
+    z-index: 1;
 }
 
 .multiselect-trigger {
@@ -684,6 +780,8 @@ nav {
     transition: all 0.2s ease;
     min-height: 52px;
     font-size: 1rem;
+    position: relative;
+    z-index: 2;
 }
 
 .multiselect-trigger:hover {
@@ -699,37 +797,56 @@ nav {
 .custom-multiselect.open .multiselect-trigger {
     border-color: #047857;
     box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1);
+    z-index: 10001;
 }
 
 .multiselect-placeholder {
     flex: 1;
     color: #9ca3af;
     font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .multiselect-arrow {
     transition: transform 0.2s ease;
     stroke: #6b7280;
     flex-shrink: 0;
+    margin-left: 0.5rem;
+    width: 20px;
+    height: 20px;
 }
 
 .custom-multiselect.open .multiselect-arrow {
     transform: rotate(180deg);
 }
 
+/* ✅ DROPDOWN SOBREPÕE ABSOLUTAMENTE TUDO */
 .multiselect-dropdown {
     position: absolute;
     top: calc(100% + 0.5rem);
     left: 0;
     right: 0;
     background: white;
-    border: 2px solid #e5e7eb;
+    border: 2px solid #047857;
     border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-    z-index: 100;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.custom-multiselect.open .multiselect-dropdown {
     max-height: 320px;
     overflow-y: auto;
     padding: 0.5rem;
+    opacity: 1;
+    visibility: visible;
 }
 
 .checkbox-item {
@@ -755,6 +872,8 @@ nav {
     position: absolute;
     opacity: 0;
     pointer-events: none;
+    width: 0;
+    height: 0;
 }
 
 .checkbox-custom {
@@ -802,14 +921,18 @@ nav {
     font-weight: 600;
 }
 
+/* Validação */
 .custom-multiselect.input-valid .multiselect-trigger {
     border-color: #10b981 !important;
+    background-color: #f0fdf4;
 }
 
 .custom-multiselect.input-invalid .multiselect-trigger {
     border-color: #ef4444 !important;
+    background-color: #fef2f2;
 }
 
+/* Scrollbar */
 .multiselect-dropdown::-webkit-scrollbar {
     width: 8px;
 }
@@ -829,7 +952,85 @@ nav {
 }
 
 /* ========================================
-   RESULTS SECTION - BUG FIX TABS
+   ✅ MATERIAL QUANTITIES CONTAINER
+   ======================================== */
+
+#material-quantities-container {
+    margin-top: 1.5rem;
+    display: none;
+}
+
+#material-quantities-container.has-items {
+    display: block;
+}
+
+.material-quantity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    animation: slideInMaterial 0.3s ease;
+}
+
+@keyframes slideInMaterial {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.material-quantity-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    min-width: 150px;
+    flex-shrink: 0;
+}
+
+.material-quantity-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: white;
+}
+
+.material-quantity-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.material-quantity-input.input-valid {
+    border-color: #10b981 !important;
+    background-color: #f0fdf4;
+}
+
+.material-quantity-input.input-invalid {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2;
+}
+
+.material-unit {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-weight: 500;
+    min-width: 60px;
+    text-align: right;
+}
+
+/* ========================================
+   RESULTS SECTION
    ======================================== */
 
 #results {
@@ -1056,7 +1257,7 @@ nav {
     font-weight: 600;
 }
 
-/* CHARTS TABS - BUG FIX (SEM ANIMAÇÃO INFINITA) */
+/* CHARTS TABS */
 .charts-tabs {
     background: #ffffff;
     border-radius: 12px;
@@ -1111,7 +1312,7 @@ nav {
 }
 
 .tab-pane canvas {
-    max-height: 350px;
+    max-height: 400px;
 }
 
 /* Comparison Table */
@@ -1656,17 +1857,6 @@ footer {
     margin: 0;
 }
 
-@keyframes fadeInSlide {
-    from {
-        opacity: 0;
-        transform: translateY(-12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 /* ========================================
    METHODOLOGY SECTION
    ======================================== */
@@ -1987,181 +2177,7 @@ footer {
 }
 
 /* ========================================
-   RESPONSIVE
-   ======================================== */
-@media (max-width: 1200px) {
-    .hero-container {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-    }
-
-    .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .footer-container {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .methodology-grid {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .top-header {
-        display: none;
-    }
-
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-
-    .hero-stats {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
-    .section-title {
-        font-size: 2rem;
-    }
-
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .calculator-card {
-        padding: 2rem;
-    }
-
-    .footer-container {
-        grid-template-columns: 1fr;
-    }
-
-    .results-compact-header {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.5rem;
-    }
-    
-    .decision-badge-compact {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .savings-compact {
-        text-align: center;
-    }
-    
-    .results-quick-stats {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .quick-stat-divider {
-        transform: rotate(90deg);
-    }
-    
-    .tabs-header {
-        overflow-x: auto;
-    }
-    
-    .tab-btn {
-        white-space: nowrap;
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .methodology-section {
-        padding: 5rem 5%;
-    }
-
-    .methodology-framework {
-        padding: 2rem;
-        margin: 3rem auto 4rem;
-    }
-
-    .framework-content {
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    .framework-icon {
-        width: 56px;
-        height: 56px;
-    }
-
-    .framework-text h3 {
-        font-size: 1.25rem;
-    }
-
-    .methodology-card {
-        padding: 2rem;
-    }
-
-    .outcome-block {
-        padding: 1rem;
-    }
-
-    .outcome-description {
-        font-size: 0.85rem;
-    }
-
-    .methodology-footer {
-        flex-direction: column;
-        padding: 2rem;
-        gap: 1rem;
-    }
-
-    .scenario-items-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .scenario-pill {
-        font-size: 0.8rem;
-        padding: 0.5rem 0.625rem;
-    }
-
-    .faq-question {
-        padding: 1.5rem 1.5rem;
-        font-size: 1.05rem;
-    }
-    
-    .faq-answer {
-        padding: 1.5rem 1.5rem 1.75rem 1.5rem;
-        font-size: 1rem;
-        line-height: 1.8;
-    }
-    
-    .faq-item {
-        margin-bottom: 1rem;
-    }
-
-    .validation-notification {
-        top: 80px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
-        font-size: 0.875rem;
-        padding: 0.875rem 1.25rem;
-    }
-    
-    .form-input.input-valid,
-    .form-input.input-invalid,
-    .form-select.input-valid,
-    .form-select.input-invalid {
-        background-size: 18px;
-        padding-right: 40px;
-    }
-}
-
-/* ========================================
-   CHART CONTAINERS - MELHOR ESTÉTICA
+   CHART CONTAINERS
    ======================================== */
 
 .chart-container {
@@ -2170,7 +2186,7 @@ footer {
     padding: 2.5rem;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
     margin: 2rem 0;
-    min-height: 450px; /* ✅ Altura fixa */
+    min-height: 450px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2179,30 +2195,28 @@ footer {
 #tab-comparison,
 #tab-breakdown,
 #tab-timeline {
-    min-height: 500px; /* ✅ Altura mínima */
+    min-height: 500px;
     padding: 2rem;
 }
 
-/* Canvas dos gráficos */
 #barChart,
 #pieChart,
 #lineChart {
     max-width: 100%;
-    height: 400px !important; /* ✅ Altura fixa */
+    height: 400px !important;
 }
 
-/* Timeline específico */
 #tab-timeline .chart-container {
     min-height: 500px;
     padding: 2.5rem;
 }
 
 #lineChart {
-    height: 450px !important; /* ✅ Maior altura para o timeline */
+    height: 450px !important;
 }
 
 /* ========================================
-   COMPARISON TABLE - FORMATAÇÃO MELHORADA
+   COMPARISON TABLE
    ======================================== */
 
 #tab-table {
@@ -2228,14 +2242,14 @@ footer {
 }
 
 #comparisonTable thead th {
-    padding: 1.75rem 1.25rem; /* ✅ Maior padding */
+    padding: 1.75rem 1.25rem;
     font-weight: 600;
-    font-size: 1rem; /* ✅ Fonte maior */
+    font-size: 1rem;
     text-align: center;
-    white-space: normal; /* ✅ Permite quebra de linha */
+    white-space: normal;
     line-height: 1.4;
     border-right: 1px solid rgba(255, 255, 255, 0.2);
-    min-width: 140px; /* ✅ Largura mínima */
+    min-width: 140px;
 }
 
 #comparisonTable thead th:first-child {
@@ -2268,14 +2282,14 @@ footer {
 }
 
 #comparisonTable tbody td {
-    padding: 1.5rem 1.25rem; /* ✅ Maior padding */
-    font-size: 1rem; /* ✅ Fonte maior */
+    padding: 1.5rem 1.25rem;
+    font-size: 1rem;
     color: #374151;
     text-align: center;
     border-right: 1px solid #f3f4f6;
     vertical-align: middle;
     line-height: 1.6;
-    min-height: 70px; /* ✅ Altura mínima */
+    min-height: 70px;
     white-space: nowrap;
 }
 
@@ -2316,7 +2330,6 @@ footer {
     font-size: 1.2rem;
 }
 
-/* Container com scroll horizontal suave */
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
@@ -2326,7 +2339,6 @@ footer {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
 }
 
-/* Scrollbar personalizada */
 .table-wrapper::-webkit-scrollbar {
     height: 12px;
 }
@@ -2347,71 +2359,19 @@ footer {
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
-/* Ícones na coluna Category */
-#comparisonTable tbody td svg,
-#comparisonTable tbody td img {
-    display: inline-block;
-    margin-right: 0.5rem;
-    vertical-align: middle;
-}
-
-/* Responsivo */
-@media (max-width: 1200px) {
-    #comparisonTable {
-        font-size: 0.9rem;
-    }
-    
-    #comparisonTable thead th,
-    #comparisonTable tbody td {
-        padding: 1.25rem 1rem;
-        min-width: 120px;
-    }
-    
-    #comparisonTable thead th:first-child,
-    #comparisonTable tbody td:first-child {
-        min-width: 150px;
-    }
-}
-
-@media (max-width: 768px) {
-    #comparisonTable {
-        font-size: 0.85rem;
-    }
-    
-    #comparisonTable thead th,
-    #comparisonTable tbody td {
-        padding: 1rem 0.75rem;
-        min-width: 110px;
-    }
-    
-    #comparisonTable thead th:first-child,
-    #comparisonTable tbody td:first-child {
-        position: sticky;
-        left: 0;
-        z-index: 10;
-        background: white;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-    }
-}
-
 /* ========================================
-   METHODOLOGY TABS - COMPACT VERSION
+   ✅ METHODOLOGY TABS - CORRIGIDAS
    ======================================== */
 
 .methodology-tabs-container {
     background: white;
-    border-radius: 16px 16px 0 0; /* ✅ SÓ ARREDONDA NO TOPO */
+    border-radius: 16px 16px 0 0;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     border: 1px solid #e5e7eb;
-    border-bottom: none; /* ✅ REMOVE BORDA DE BAIXO PARA CONECTAR */
+    border-bottom: none;
     margin-bottom: 0;
-
 }
-
-/* ========================================
-   TABS NAVIGATION
-   ======================================== */
 
 .tabs-navigation {
     display: flex;
@@ -2477,10 +2437,7 @@ footer {
     background: linear-gradient(90deg, #10b981 0%, #059669 100%);
 }
 
-/* ========================================
-   TAB CONTENT
-   ======================================== */
-
+/* ✅ TAB CONTENT - SÓ MOSTRA O ACTIVE */
 .tab-content {
     display: none;
     padding: 2rem;
@@ -2490,21 +2447,6 @@ footer {
 .tab-content.active {
     display: block;
 }
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ========================================
-   VARIABLES COMPACT
-   ======================================== */
 
 .variables-grid-compact {
     display: grid;
@@ -2548,10 +2490,6 @@ footer {
     color: #6b7280;
     margin: 0;
 }
-
-/* ========================================
-   SCENARIOS COMPACT
-   ======================================== */
 
 .scenarios-info-banner-compact {
     display: flex;
@@ -2657,10 +2595,6 @@ footer {
     color: #059669;
 }
 
-/* ========================================
-   DEMOLISH WARNING
-   ======================================== */
-
 .demolish-warning {
     display: flex;
     align-items: center;
@@ -2683,10 +2617,6 @@ footer {
     color: #92400e;
     line-height: 1.4;
 }
-
-/* ========================================
-   SCENARIO POP-UPS
-   ======================================== */
 
 .scenario-popup-container {
     max-height: 0;
@@ -2866,10 +2796,6 @@ footer {
     font-size: 1.1rem;
 }
 
-/* ========================================
-   OUTCOMES COMPACT
-   ======================================== */
-
 .outcomes-grid-compact {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -2954,10 +2880,6 @@ footer {
     color: #374151;
 }
 
-/* ========================================
-   FRAMEWORK BANNER FORA (COLADO EMBAIXO DA TABS-CONTAINER)
-   ======================================== */
-
 .methodology-framework-outside {
     background: linear-gradient(135deg, #f0fdf4 0%, #d1fae5 100%);
     border: 2px solid #10b981;
@@ -3005,141 +2927,178 @@ footer {
 }
 
 /* ========================================
-   POP-UPS COMPACTOS
+   RESPONSIVE
    ======================================== */
+@media (max-width: 1200px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
 
-.scenario-detail-popup {
-    background: white;
-    border: 2px solid #10b981;
-    border-radius: 12px;
-    padding: 1.25rem;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
-    animation: slideDownFade 0.4s ease;
-}
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
-.detail-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-    padding-bottom: 0.875rem;
-    border-bottom: 2px solid #e5e7eb;
-}
+    .footer-container {
+        grid-template-columns: 1fr 1fr;
+    }
 
-.detail-title-group h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin: 0;
-}
-
-.detail-description {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: #374151;
-    margin-bottom: 1rem;
-}
-
-.detail-specs {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.spec-item {
-    background: #f9fafb;
-    padding: 0.75rem;
-    border-radius: 8px;
-    border-left: 3px solid #10b981;
-    text-align: center;
-}
-
-.spec-label {
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-bottom: 0.25rem;
-    display: block;
-}
-
-.spec-value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1f2937;
-}
-
-.detail-lists {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-}
-
-.detail-list h4 {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin: 0 0 0.625rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-}
-
-.detail-list ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.detail-list li {
-    padding: 0.5rem 0;
-    padding-left: 1.25rem;
-    position: relative;
-    line-height: 1.5;
-    color: #374151;
-    font-size: 0.85rem;
-}
-
-.detail-list li::before {
-    content: "→";
-    position: absolute;
-    left: 0;
-    color: #10b981;
-    font-weight: 700;
-    font-size: 1rem;
+    .methodology-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
 }
 
 @media (max-width: 768px) {
-    .detail-specs {
-        grid-template-columns: repeat(2, 1fr);
+    .top-header {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-stats {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 2rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .calculator-card {
+        padding: 2rem;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+    }
+
+    .results-compact-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
     }
     
-    .detail-lists {
+    .decision-badge-compact {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .savings-compact {
+        text-align: center;
+    }
+    
+    .results-quick-stats {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .quick-stat-divider {
+        transform: rotate(90deg);
+    }
+    
+    .tabs-header {
+        overflow-x: auto;
+    }
+    
+    .tab-btn {
+        white-space: nowrap;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .methodology-section {
+        padding: 5rem 5%;
+    }
+
+    .methodology-framework {
+        padding: 2rem;
+        margin: 3rem auto 4rem;
+    }
+
+    .framework-content {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .framework-icon {
+        width: 56px;
+        height: 56px;
+    }
+
+    .framework-text h3 {
+        font-size: 1.25rem;
+    }
+
+    .methodology-card {
+        padding: 2rem;
+    }
+
+    .outcome-block {
+        padding: 1rem;
+    }
+
+    .outcome-description {
+        font-size: 0.85rem;
+    }
+
+    .methodology-footer {
+        flex-direction: column;
+        padding: 2rem;
+        gap: 1rem;
+    }
+
+    .scenario-items-row {
         grid-template-columns: 1fr;
     }
     
-    .methodology-framework-outside {
-        padding: 1rem 1.25rem;
-    }
-    
-    .methodology-framework-outside h3 {
-        font-size: 0.95rem;
-    }
-    
-    .methodology-framework-outside p {
+    .scenario-pill {
         font-size: 0.8rem;
+        padding: 0.5rem 0.625rem;
     }
-}
 
+    .faq-question {
+        padding: 1.5rem 1.5rem;
+        font-size: 1.05rem;
+    }
+    
+    .faq-answer {
+        padding: 1.5rem 1.5rem 1.75rem 1.5rem;
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+    
+    .faq-item {
+        margin-bottom: 1rem;
+    }
 
+    .validation-notification {
+        top: 80px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        font-size: 0.875rem;
+        padding: 0.875rem 1.25rem;
+    }
+    
+    .form-input.input-valid,
+    .form-input.input-invalid,
+    .form-select.input-valid,
+    .form-select.input-invalid {
+        background-size: 18px;
+        padding-right: 40px;
+    }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-
-@media (max-width: 768px) {
     .tabs-navigation {
         flex-direction: column;
     }
@@ -3185,15 +3144,2539 @@ footer {
         font-size: 1.25rem;
     }
     
-    .framework-content-bottom {
+    .methodology-framework-outside {
         padding: 1rem 1.25rem;
     }
     
-    .framework-content-bottom h3 {
+    .methodology-framework-outside h3 {
+        font-size: 0.95rem;
+    }
+    
+    .methodology-framework-outside p {
+        font-size: 0.8rem;
+    }
+
+    #comparisonTable {
+        font-size: 0.85rem;
+    }
+    
+    #comparisonTable thead th,
+    #comparisonTable tbody td {
+        padding: 1rem 0.75rem;
+        min-width: 110px;
+    }
+    
+    #comparisonTable thead th:first-child,
+    #comparisonTable tbody td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 10;
+        background: white;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    }
+
+    .progress-bar-container {
+        max-width: 100%;
+        gap: 0.5rem;
+    }
+
+    .step-number {
+        width: 48px;
+        height: 48px;
+        font-size: 1.1rem;
+    }
+
+    .step-label {
+        font-size: 0.75rem;
+        max-width: 80px;
+    }
+
+    .progress-step:not(:last-child)::after {
+        top: 24px;
+        width: calc(100% + 10px);
+    }
+
+    .material-quantity-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+
+    .material-quantity-label {
+        min-width: auto;
+    }
+
+    .material-unit {
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-bar-container {
+        flex-direction: column;
+        gap: 1.5rem;
+        max-width: 200px;
+    }
+
+    .progress-step:not(:last-child)::after {
+        display: none;
+    }
+
+    .step-number {
+        width: 56px;
+        height: 56px;
+        font-size: 1.25rem;
+    }
+
+    .step-label {
+        max-width: 150px;
+        font-size: 0.875rem;
+    }
+}
+
+/* ========================================
+   ✅ CORREÇÕES FINAIS - ADICIONAR NO FINAL
+   ======================================== */
+
+/* ========================================
+   1️⃣ TÍTULOS DAS SECÇÕES - FORÇAR TAMANHOS CORRETOS
+   ======================================== */
+
+/* Hero */
+.hero h1 {
+    font-size: 4rem !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.03em !important;
+    color: var(--darker) !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.hero-subtitle {
+    font-size: 1.35rem !important;
+    line-height: 1.7 !important;
+    color: var(--text-light) !important;
+    font-weight: 400 !important;
+    margin-bottom: 2.5rem !important;
+}
+
+/* Section Headers - TODAS AS SECÇÕES */
+.section-header {
+    text-align: center !important;
+    margin-bottom: 5rem !important;
+}
+
+.section-eyebrow {
+    font-size: 0.9rem !important;
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+    margin-bottom: 1rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+}
+
+.section-title {
+    font-size: 3rem !important;
+    font-weight: 800 !important;
+    color: var(--darker) !important;
+    margin-bottom: 1.5rem !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+}
+
+.section-description {
+    font-size: 1.25rem !important;
+    color: var(--text-light) !important;
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    line-height: 1.8 !important;
+    text-align: center !important;
+}
+
+/* Methodology Section */
+.methodology-section .section-header .section-eyebrow {
+    font-size: 0.9rem !important;
+    color: var(--primary) !important;
+    font-weight: 700 !important;
+}
+
+.methodology-section .section-header .section-title {
+    font-size: 3rem !important;
+    font-weight: 800 !important;
+    color: var(--darker) !important;
+}
+
+.methodology-section .section-header .section-description {
+    font-size: 1.25rem !important;
+    color: var(--text-light) !important;
+}
+
+/* Calculator Section */
+.calculator-section .section-header .section-title {
+    font-size: 3rem !important;
+    font-weight: 800 !important;
+}
+
+.form-section-title {
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: var(--darker) !important;
+    margin-bottom: 1rem !important;
+    text-align: center !important;
+}
+
+.form-section-description {
+    font-size: 1.1rem !important;
+    color: var(--text-light) !important;
+    text-align: center !important;
+}
+
+/* FAQ Section */
+.faq-section .section-header .section-title {
+    font-size: 3rem !important;
+    font-weight: 800 !important;
+}
+
+.faq-question {
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    color: var(--text-dark) !important;
+}
+
+/* Footer */
+.footer-brand h3 {
+    font-size: 1.5rem !important;
+    color: white !important;
+    font-weight: 700 !important;
+}
+
+/* Feature Cards */
+.feature-card h3 {
+    font-size: 1.35rem !important;
+    font-weight: 700 !important;
+    color: var(--darker) !important;
+}
+
+/* Stat Cards */
+.stat-card-label {
+    font-size: 1rem !important;
+    color: var(--text) !important;
+    font-weight: 600 !important;
+}
+
+/* ========================================
+   2️⃣ METHODOLOGY TABS - GARANTIR VISIBILIDADE DO CONTEÚDO
+   ======================================== */
+
+/* Forçar display dos conteúdos das tabs */
+.tab-content {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+}
+
+.tab-content.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    height: auto !important;
+    overflow: visible !important;
+    animation: fadeIn 0.4s ease !important;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Garantir que as grids aparecem */
+.variables-grid-compact,
+.scenarios-list-compact,
+.outcomes-grid-compact {
+    display: grid !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* ========================================
+   3️⃣ DROPDOWN DE MATERIAIS - SOBREPOR ABSOLUTAMENTE TUDO
+   ======================================== */
+
+/* Container do dropdown */
+.custom-multiselect {
+    position: relative !important;
+    width: 100% !important;
+    z-index: 1 !important;
+}
+
+/* Trigger do dropdown */
+.multiselect-trigger {
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+/* Quando aberto, trigger fica ainda mais alto */
+.custom-multiselect.open .multiselect-trigger {
+    z-index: 10002 !important;
+    border-color: #047857 !important;
+    box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1) !important;
+}
+
+/* Menu do dropdown - SOBREPÕE TUDO */
+.multiselect-dropdown {
+    position: absolute !important;
+    top: calc(100% + 0.5rem) !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 2px solid #047857 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
+    z-index: 99999 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: all 0.3s ease !important;
+}
+
+.custom-multiselect.open .multiselect-dropdown {
+    max-height: 320px !important;
+    overflow-y: auto !important;
+    padding: 0.5rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 99999 !important;
+}
+
+/* Garantir que outros selects ficam atrás */
+.form-select {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Form navigation também fica atrás */
+.form-navigation {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* ========================================
+   4️⃣ BLOCO DE EXPLICAÇÃO DO CENÁRIO NOS RESULTADOS
+   ======================================== */
+
+/* Container do bloco explicativo */
+.scenario-explanation-block {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 1.25rem !important;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+    border: 2px solid #3b82f6 !important;
+    border-left: 4px solid #3b82f6 !important;
+    border-radius: 12px !important;
+    padding: 1.75rem 2rem !important;
+    margin: 1.5rem 0 2rem 0 !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+    opacity: 0 !important;
+    transform: translateY(-10px) !important;
+    transition: all 0.4s ease !important;
+    animation: slideInExplanation 0.5s ease forwards !important;
+}
+
+@keyframes slideInExplanation {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ícone do bloco */
+.scenario-explanation-block .explanation-icon {
+    flex-shrink: 0 !important;
+    width: 48px !important;
+    height: 48px !important;
+    background: white !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
+}
+
+.scenario-explanation-block .explanation-icon svg {
+    width: 24px !important;
+    height: 24px !important;
+    color: #3b82f6 !important;
+}
+
+/* Conteúdo do bloco */
+.scenario-explanation-block .explanation-content {
+    flex: 1 !important;
+}
+
+.scenario-explanation-block .explanation-content h4 {
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    color: #1e40af !important;
+    margin: 0 0 0.75rem 0 !important;
+    line-height: 1.3 !important;
+}
+
+.scenario-explanation-block .explanation-content p {
+    font-size: 1rem !important;
+    line-height: 1.7 !important;
+    color: #1e3a8a !important;
+    margin: 0 !important;
+}
+
+/* ========================================
+   5️⃣ RESPONSIVE - TÍTULOS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2.5rem !important;
+    }
+
+    .hero-subtitle {
+        font-size: 1.15rem !important;
+    }
+
+    .section-title {
+        font-size: 2rem !important;
+    }
+
+    .section-description {
+        font-size: 1.1rem !important;
+    }
+
+    .form-section-title {
+        font-size: 1.5rem !important;
+    }
+
+    .form-section-description {
+        font-size: 1rem !important;
+    }
+
+    .faq-question {
+        font-size: 1.05rem !important;
+        padding: 1.5rem 1.5rem !important;
+    }
+
+    .feature-card h3 {
+        font-size: 1.2rem !important;
+    }
+
+    /* Bloco explicativo em mobile */
+    .scenario-explanation-block {
+        flex-direction: column !important;
+        gap: 1rem !important;
+        padding: 1.5rem !important;
+    }
+
+    .scenario-explanation-block .explanation-icon {
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    .scenario-explanation-block .explanation-content h4 {
+        font-size: 1rem !important;
+    }
+
+    .scenario-explanation-block .explanation-content p {
+        font-size: 0.9rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem !important;
+    }
+
+    .section-title {
+        font-size: 1.75rem !important;
+    }
+
+    .form-section-title {
+        font-size: 1.35rem !important;
+    }
+}
+
+/* ========================================
+   6️⃣ GARANTIR QUE TABS DA METODOLOGIA FUNCIONAM
+   ======================================== */
+
+/* Forçar apenas um conteúdo visível de cada vez */
+#tab-variables:not(.active),
+#tab-scenarios:not(.active),
+#tab-outcomes:not(.active) {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    pointer-events: none !important;
+}
+
+#tab-variables.active,
+#tab-scenarios.active,
+#tab-outcomes.active {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    height: auto !important;
+    pointer-events: auto !important;
+}
+
+/* Garantir que os grids dentro das tabs aparecem */
+#tab-variables.active .variables-grid-compact,
+#tab-scenarios.active .scenarios-list-compact,
+#tab-outcomes.active .outcomes-grid-compact {
+    display: grid !important;
+    opacity: 1 !important;
+    min-height: 200px !important;
+}
+
+/* ========================================
+   ✅ FIM DAS CORREÇÕES
+   ======================================== */
+
+   /* ========================================
+   CORREÇÕES FINAIS - DROPDOWN + COR
+   ======================================== */
+
+/* 1. COR VERMELHA MELHORADA */
+:root {
+    --danger: #dc2626; /* Vermelho melhor */
+    --danger-light: #fee2e2;
+    --danger-dark: #991b1b;
+}
+
+.badge-low-carbon { background: var(--danger-light) !important; color: var(--danger) !important; }
+.result-category-low-carbon { border-color: var(--danger) !important; }
+.demolish-column { border-left-color: var(--danger) !important; }
+
+/* 2. DROPDOWN DE MATERIAIS - FORÇAR SOBREPOSIÇÃO */
+.custom-multiselect {
+    position: relative !important;
+    z-index: 99999 !important;
+}
+
+.custom-multiselect.active {
+    z-index: 100000 !important;
+}
+
+.custom-multiselect-dropdown {
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    width: 100% !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+    background: white !important;
+    border: 2px solid var(--primary) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15) !important;
+    z-index: 100001 !important;
+    margin-top: 4px !important;
+}
+
+/* Garantir que TODOS os outros elementos ficam atrás */
+.form-section, .form-row, .form-group, 
+.input-group, select, input, button,
+.progress-bar, .section-title, .hero,
+nav, .announcement-bar {
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* Exceto quando o dropdown está ativo */
+.custom-multiselect.active ~ * {
+    z-index: 1 !important;
+}
+
+/* 3. ACORDEÕES DA METODOLOGIA - GARANTIR FUNCIONAMENTO */
+.methodology-tabs {
+    margin-bottom: 3rem;
+}
+
+.tab-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.tab-btn {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-light);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.05rem;
+}
+
+.tab-btn:hover {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: var(--primary-light);
+}
+
+/* Esconder conteúdo inativo */
+.tab-content {
+    display: none !important;
+    opacity: 0;
+}
+
+.tab-content.active {
+    display: block !important;
+    opacity: 1;
+    animation: fadeIn 0.3s ease;
+}
+
+/* 4. BLOCO DE EXPLICAÇÃO DO CENÁRIO */
+.scenario-explanation-block {
+    display: block !important;
+    background: linear-gradient(135deg, #ecfeff 0%, #cffafe 100%);
+    border: 2px solid #0891b2;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    animation: slideInUp 0.5s ease;
+}
+
+.scenario-explanation-block h3 {
+    color: #0e7490;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.scenario-explanation-block .icon {
+    width: 28px;
+    height: 28px;
+    background: #0891b2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.scenario-explanation-block p {
+    color: #164e63;
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+@keyframes slideInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 5. RESPONSIVO */
+@media (max-width: 768px) {
+    .tab-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .tab-btn {
+        width: 100%;
+        text-align: left;
+        border-left: 3px solid transparent;
+        border-bottom: none;
+    }
+    
+    .tab-btn.active {
+        border-left-color: var(--primary);
+        border-bottom-color: transparent;
+    }
+    
+    .scenario-explanation-block {
+        padding: 1.5rem;
+    }
+    
+    .scenario-explanation-block h3 {
+        font-size: 1.25rem;
+    }
+}
+
+/* ========================================
+   🔧 CORREÇÕES FINAIS - 100% CLEAN
+   ======================================== */
+
+/* 1️⃣ DROPDOWN DE MATERIAIS - SOBREPÕE TUDO (INCLUINDO BOTÕES) */
+.form-navigation {
+    position: relative;
+    z-index: 1;
+}
+
+.custom-multiselect {
+    position: relative;
+    z-index: 1;
+}
+
+.custom-multiselect.open {
+    z-index: 99999 !important;
+}
+
+.custom-multiselect.open .multiselect-trigger {
+    border-color: #047857 !important;
+    box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1) !important;
+    background: white !important;
+}
+
+.multiselect-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: white !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.2) !important;
+    z-index: 100000 !important;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+/* Garante que TODOS os elementos ficam atrás do dropdown */
+nav,
+.form-section,
+.form-group,
+.calculator-card,
+.section-header,
+.btn,
+.btn-primary,
+.btn-secondary,
+#btn-next,
+#btn-back {
+    position: relative;
+    z-index: 1 !important;
+}
+
+.calculator-card {
+    overflow: visible !important;
+}
+
+/* Quando dropdown está aberto, botões ficam atrás */
+body:has(.custom-multiselect.open) .form-navigation {
+    z-index: 1 !important;
+}
+
+body:has(.custom-multiselect.open) .btn {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* 2️⃣ TABS DA METODOLOGIA - SEM FUNDO VERDE */
+.tabs-navigation {
+    display: flex;
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 0;
+    gap: 0;
+}
+
+.tab-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem;
+    background: transparent !important;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #6b7280;
+    transition: all 0.3s ease;
+    position: relative;
+    border-right: 1px solid #e5e7eb;
+}
+
+.tab-btn:last-child {
+    border-right: none;
+}
+
+.tab-btn .tab-icon {
+    color: #9ca3af;
+    transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+    background: #f3f4f6 !important;
+    color: #1f2937;
+}
+
+.tab-btn:hover .tab-icon {
+    color: #10b981;
+}
+
+.tab-btn.active {
+    background: white !important;
+    color: #10b981;
+    font-weight: 700;
+}
+
+.tab-btn.active .tab-icon {
+    color: #10b981;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+/* 3️⃣ COR VERMELHA MELHORADA */
+:root {
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+}
+
+/* 4️⃣ BLOCO DE EXPLICAÇÃO DO CENÁRIO (ABAIXO DOS QUICK STATS) */
+.scenario-explanation-block {
+    display: block;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border: 3px solid #3b82f6;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    margin: 0 0 2rem 0;
+    animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+}
+
+.scenario-explanation-block h3 {
+    color: #1e40af;
+    font-size: 1.35rem;
+    margin-bottom: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+}
+
+.scenario-explanation-block .icon {
+    width: 32px;
+    height: 32px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.scenario-explanation-block p {
+    color: #1e3a8a;
+    line-height: 1.7;
+    font-size: 1rem;
+    margin: 0;
+}
+
+@keyframes slideInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* 5️⃣ TABS DA METODOLOGIA - GARANTIR VISIBILIDADE */
+.tab-content {
+    display: none !important;
+    opacity: 0;
+}
+
+.tab-content.active {
+    display: block !important;
+    opacity: 1;
+    animation: fadeIn 0.4s ease;
+}
+
+.variables-grid-compact,
+.scenarios-list-compact,
+.outcomes-grid-compact {
+    display: grid !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 6️⃣ POP-UPS DOS CENÁRIOS - MAIS COMPACTO E EMBAIXO */
+.scenario-popup-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, margin 0.5s ease, opacity 0.5s ease;
+    margin: 0;
+    opacity: 0;
+}
+
+.scenario-popup-container.visible {
+    max-height: 2000px;
+    margin: 1rem 0 0 0;
+    opacity: 1;
+}
+
+.scenario-detail-popup {
+    background: white;
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.15);
+    animation: slideDownFade 0.4s ease;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.detail-title-group {
+    flex: 1;
+}
+
+.detail-title-group .scenario-badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.detail-title-group .scenario-badge.renovation {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #047857;
+}
+
+.detail-title-group .scenario-badge.newbuild {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+}
+
+.detail-title-group h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.detail-close-btn {
+    background: #f3f4f6;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.detail-close-btn:hover {
+    background: #e5e7eb;
+    transform: rotate(90deg);
+}
+
+.detail-close-btn svg {
+    color: #6b7280;
+}
+
+.detail-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #374151;
+    margin-bottom: 1rem;
+    background: #f9fafb;
+    padding: 0.875rem;
+    border-radius: 8px;
+    border-left: 3px solid #10b981;
+}
+
+.detail-specs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.625rem;
+    margin-bottom: 1rem;
+}
+
+.spec-item {
+    background: #f9fafb;
+    padding: 0.625rem;
+    border-radius: 8px;
+    border-left: 3px solid #10b981;
+    text-align: center;
+}
+
+.spec-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.spec-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.detail-lists {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+}
+
+.detail-list h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.detail-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-list li {
+    padding: 0.375rem 0.75rem;
+    position: relative;
+    line-height: 1.4;
+    color: #374151;
+    font-size: 0.75rem;
+    background: #f3f4f6;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.detail-list li::before {
+    content: none;
+}
+
+/* 7️⃣ RESPONSIVO */
+@media (max-width: 768px) {
+    .scenario-explanation-block {
+        padding: 1.5rem;
+    }
+    
+    .scenario-explanation-block h3 {
+        font-size: 1.15rem;
+    }
+    
+    .multiselect-dropdown {
+        max-height: 250px;
+    }
+    
+    .detail-specs {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .detail-lists {
+        grid-template-columns: 1fr;
+    }
+    
+    .scenario-detail-popup {
+        padding: 1rem;
+    }
+    
+    .detail-title-group h3 {
+        font-size: 1.05rem;
+    }
+    
+    .detail-description {
+        font-size: 0.85rem;
+        padding: 0.75rem;
+    }
+    
+    .detail-list ul {
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+    
+    body:has(.custom-multiselect.open) .btn {
+        pointer-events: auto;
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   🔴 FORÇA BRUTA - DROPDOWN SOBREPÕE TUDO
+   ======================================== */
+
+/* 1️⃣ DROPDOWN ABSOLUTE COM Z-INDEX MÁXIMO */
+.multiselect-dropdown {
+    position: fixed !important;
+    z-index: 999999 !important;
+    background: white !important;
+    border: 2px solid #d1d5db !important;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.3) !important;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+/* Quando dropdown está aberto, esconde botões */
+body.dropdown-open .form-navigation {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+body.dropdown-open #btn-next,
+body.dropdown-open #btn-back {
+    visibility: hidden !important;
+}
+
+/* ========================================
+   🔧 CORREÇÕES FINAIS - TODOS OS PROBLEMAS
+   ======================================== */
+
+/* ============================================
+   PROBLEMA 1: DROPDOWN SOBREPÕE BOTÕES
+   ============================================ */
+
+/* Força o dropdown a ficar por cima de TUDO */
+.custom-multiselect {
+    position: relative;
+    z-index: 1;
+}
+
+.custom-multiselect.open {
+    z-index: 999999 !important;
+}
+
+.multiselect-dropdown {
+    position: absolute !important;
+    top: calc(100% + 0.5rem) !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+    z-index: 9999999 !important;
+    max-height: 320px !important;
+    overflow-y: auto !important;
+    padding: 0.5rem !important;
+}
+
+/* Força TODOS os outros elementos para trás */
+.form-navigation,
+.btn,
+.btn-primary,
+.btn-secondary,
+#btn-next,
+#btn-back,
+.form-section,
+.form-group,
+.calculator-card,
+nav,
+.section-header {
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* Quando o dropdown está aberto, congela os botões */
+body.dropdown-open .form-navigation {
+    pointer-events: none;
+    opacity: 0.3;
+}
+
+body.dropdown-open .multiselect-dropdown {
+    pointer-events: all;
+}
+
+.calculator-card {
+    overflow: visible !important;
+}
+
+/* Remove borda verde quando abre */
+.custom-multiselect.open .multiselect-trigger {
+    border-color: #d1d5db !important;
+    box-shadow: 0 0 0 3px rgba(209, 213, 219, 0.1) !important;
+}
+
+/* ============================================
+   PROBLEMA 2: BLOCO DE EXPLICAÇÃO DO CENÁRIO
+   ============================================ */
+
+#scenario-explanation {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.scenario-explanation-block {
+    display: block;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border: 3px solid #3b82f6;
+    border-radius: 16px;
+    padding: 2rem;
+    margin: 0 0 2rem 0;
+    animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+}
+
+.scenario-explanation-block h3 {
+    color: #1e40af;
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.scenario-explanation-block .icon {
+    width: 36px;
+    height: 36px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.scenario-explanation-block p {
+    color: #1e3a8a;
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+@keyframes slideInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* ============================================
+   PROBLEMA 3: POP-UPS DA METODOLOGIA
+   ============================================ */
+
+/* Container que expande para baixo */
+.scenario-popup-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                margin 0.6s ease, 
+                opacity 0.6s ease;
+    margin: 0;
+    opacity: 0;
+}
+
+.scenario-popup-container.visible {
+    max-height: 3000px;
+    margin: 1.5rem 0 0 0;
+    opacity: 1;
+}
+
+/* Pop-up compacto e aesthetic */
+.scenario-detail-popup {
+    background: white;
+    border: 2px solid #10b981;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+    animation: slideDownFade 0.5s ease;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header do pop-up */
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.detail-title-group {
+    flex: 1;
+}
+
+.detail-title-group .scenario-badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.detail-title-group .scenario-badge.renovation {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #047857;
+}
+
+.detail-title-group .scenario-badge.newbuild {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+}
+
+.detail-title-group h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Botão de fechar */
+.detail-close-btn {
+    background: #f3f4f6;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.detail-close-btn:hover {
+    background: #e5e7eb;
+    transform: rotate(90deg);
+}
+
+.detail-close-btn svg {
+    color: #6b7280;
+}
+
+/* Descrição CONCISA */
+.detail-description {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #374151;
+    margin-bottom: 1.25rem;
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #10b981;
+}
+
+/* Specs em linha */
+.detail-specs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.spec-item {
+    flex: 1;
+    min-width: 100px;
+    background: #f9fafb;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border-left: 3px solid #10b981;
+    text-align: center;
+}
+
+.spec-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.spec-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* Listas EMBAIXO (uma coluna) */
+.detail-lists {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.detail-list h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.625rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.detail-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-list li {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
+    color: #374151;
+    background: #f3f4f6;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    line-height: 1.4;
+}
+
+.detail-list li::before {
+    content: none;
+}
+
+/* ============================================
+   TABS DA METODOLOGIA (SEM FUNDO VERDE)
+   ============================================ */
+
+.tab-btn {
+    background: transparent !important;
+}
+
+.tab-btn:hover {
+    background: #f3f4f6 !important;
+}
+
+.tab-btn.active {
+    background: white !important;
+}
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+
+@media (max-width: 768px) {
+    .scenario-explanation-block {
+        padding: 1.5rem;
+    }
+    
+    .scenario-explanation-block h3 {
+        font-size: 1.25rem;
+    }
+    
+    .detail-specs {
+        flex-direction: column;
+    }
+    
+    .spec-item {
+        min-width: auto;
+    }
+    
+    .scenario-detail-popup {
+        padding: 1.25rem;
+    }
+    
+    body.dropdown-open .form-navigation {
+        pointer-events: all;
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   🔧 CORREÇÕES FINAIS - PROBLEMAS 2, 3, 4
+   ======================================== */
+
+/* ============================================
+   PROBLEMA 2: BLOCO DE EXPLICAÇÃO DO CENÁRIO
+   ============================================ */
+
+#scenario-explanation {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.scenario-explanation-block {
+    display: block;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border: 3px solid #3b82f6;
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    margin: 0 0 2rem 0;
+    animation: slideInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.3);
+}
+
+.scenario-explanation-block h3 {
+    color: #1e40af;
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.scenario-explanation-block .icon {
+    width: 36px;
+    height: 36px;
+    background: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.scenario-explanation-block p {
+    color: #1e3a8a;
+    line-height: 1.8;
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+@keyframes slideInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* ============================================
+   PROBLEMA 3: COR VERMELHA MELHORADA
+   ============================================ */
+
+:root {
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --danger-dark: #b91c1c;
+}
+
+/* Aplica cor vermelha melhorada ao badge DEMOLISH */
+.results-compact-header[data-decision="demolish"],
+.results-compact-header.demolish-decision {
+    background: linear-gradient(to right, #dc2626 0%, #b91c1c 50%, #dc2626 100%) !important;
+}
+
+/* ============================================
+   PROBLEMA 4: POP-UPS DA METODOLOGIA EMBAIXO
+   ============================================ */
+
+/* Container que expande PARA BAIXO */
+.scenario-popup-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                margin 0.6s ease, 
+                opacity 0.6s ease;
+    margin: 0;
+    opacity: 0;
+    width: 100%;
+}
+
+.scenario-popup-container.visible {
+    max-height: 2500px;
+    margin: 1.5rem 0 0 0;
+    opacity: 1;
+}
+
+/* Pop-up compacto e limpo */
+.scenario-detail-popup {
+    background: white;
+    border: 2px solid #10b981;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+    animation: slideDownFade 0.5s ease;
+    width: 100%;
+}
+
+@keyframes slideDownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header compacto */
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.detail-title-group {
+    flex: 1;
+}
+
+.detail-title-group .scenario-badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.detail-title-group .scenario-badge.renovation {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+    color: #047857;
+}
+
+.detail-title-group .scenario-badge.newbuild {
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    color: #1e40af;
+}
+
+.detail-title-group h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* Botão de fechar */
+.detail-close-btn {
+    background: #f3f4f6;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    margin-left: 1rem;
+}
+
+.detail-close-btn:hover {
+    background: #e5e7eb;
+    transform: rotate(90deg);
+}
+
+.detail-close-btn svg {
+    color: #6b7280;
+}
+
+/* Descrição CURTA (máximo 2 linhas) */
+.detail-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #374151;
+    margin-bottom: 1.25rem;
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #10b981;
+}
+
+/* Specs em LINHA HORIZONTAL */
+.detail-specs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.spec-item {
+    flex: 1;
+    min-width: 90px;
+    background: #f9fafb;
+    padding: 0.75rem 0.5rem;
+    border-radius: 8px;
+    border-left: 3px solid #10b981;
+    text-align: center;
+}
+
+.spec-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.spec-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* Listas em COLUNA (uma embaixo da outra) */
+.detail-lists {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-list h4 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.detail-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-list li {
+    padding: 0.5rem 0.875rem;
+    font-size: 0.8rem;
+    color: #374151;
+    background: #f3f4f6;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    line-height: 1.4;
+}
+
+.detail-list li::before {
+    content: none;
+}
+
+/* ============================================
+   RESPONSIVO
+   ============================================ */
+
+@media (max-width: 768px) {
+    .scenario-explanation-block {
+        padding: 1.5rem;
+    }
+    
+    .scenario-explanation-block h3 {
+        font-size: 1.25rem;
+    }
+    
+    .detail-specs {
+        flex-direction: column;
+    }
+    
+    .spec-item {
+        min-width: auto;
+    }
+    
+    .scenario-detail-popup {
+        padding: 1.25rem;
+    }
+}
+
+/* ========================================
+   🔧 FORÇA POP-UPS EMBAIXO (NÃO AO LADO)
+   ======================================== */
+
+/* Remove qualquer grid que faça aparecer ao lado */
+.scenario-category-compact {
+    display: block !important;
+    width: 100%;
+}
+
+.scenario-pills-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+}
+
+/* Container do pop-up FORÇA aparecer embaixo */
+#popup-renovation,
+#popup-newbuild {
+    display: block !important;
+    width: 100% !important;
+    grid-column: 1 / -1 !important;
+}
+
+.scenario-popup-container {
+    display: block !important;
+    width: 100% !important;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s ease, margin 0.6s ease, opacity 0.6s ease;
+    margin: 0;
+    opacity: 0;
+}
+
+.scenario-popup-container.visible {
+    max-height: 2000px;
+    margin: 1.5rem 0 0 0;
+    opacity: 1;
+}
+
+/* Pop-up compacto */
+.scenario-detail-popup {
+    background: white;
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+    animation: slideDownFade 0.4s ease;
+}
+
+@keyframes slideDownFade {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.detail-title-group h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.detail-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #374151;
+    margin-bottom: 1rem;
+    background: #f9fafb;
+    padding: 0.875rem;
+    border-radius: 8px;
+    border-left: 3px solid #10b981;
+}
+
+/* Specs em LINHA (flex) */
+.detail-specs {
+    display: flex;
+    gap: 0.625rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.spec-item {
+    flex: 1;
+    min-width: 80px;
+    background: #f9fafb;
+    padding: 0.625rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.spec-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.spec-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+/* Lists em COLUNA (uma embaixo da outra) */
+.detail-lists {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.detail-list h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 0.5rem 0;
+}
+
+.detail-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.detail-list li {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    background: #f3f4f6;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+}
+
+.detail-list li::before {
+    content: none;
+}
+
+/* ========================================
+   🔧 CORREÇÃO FINAL: DROPDOWN + BLOCO AZUL
+   ======================================== */
+
+/* 1️⃣ DROPDOWN DE MATERIAIS — SOBREPÕE TUDO */
+.custom-multiselect {
+    position: relative;
+    z-index: 1;
+}
+
+.custom-multiselect.open {
+    z-index: 10000 !important;
+}
+
+.custom-multiselect.open .multiselect-trigger {
+    border-color: #047857 !important;
+    box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.1) !important;
+}
+
+.multiselect-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+    z-index: 10001 !important;
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+/* Garante que os botões NUNCA sobrepõem o dropdown */
+.form-navigation {
+    position: relative;
+    z-index: 1 !important;
+}
+
+nav,
+.form-section,
+.form-group,
+.calculator-card {
+    position: relative;
+    z-index: 1;
+}
+
+.calculator-card {
+    overflow: visible !important;
+}
+
+/* 2️⃣ BLOCO DE EXPLICAÇÃO DO CENÁRIO (AZUL) */
+.scenario-explanation-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    border-left: 4px solid #3b82f6;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0 2rem 0;
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.4s ease;
+}
+
+.explanation-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.explanation-icon svg {
+    color: #3b82f6;
+}
+
+.explanation-content {
+    flex: 1;
+}
+
+.explanation-content h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1e40af;
+    margin: 0 0 0.5rem 0;
+}
+
+.explanation-content p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #1e3a8a;
+    margin: 0;
+}
+
+/* 3️⃣ RESPONSIVO */
+@media (max-width: 768px) {
+    .scenario-explanation-block {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem 1.25rem;
+    }
+    
+    .explanation-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .multiselect-dropdown {
+        max-height: 250px;
+    }
+}
+
+.custom-multiselect.open {
+    z-index: 10000 !important;
+}
+
+.multiselect-dropdown {
+    z-index: 10001 !important;
+}
+
+.form-navigation {
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* ========================================
+   🔧 CORREÇÕES FINAIS - VERSÃO LIMPA
+   Data: 2026-03-01
+   ======================================== */
+
+/* ============================================
+   1️⃣ DROPDOWN DE MATERIAIS - SOBREPÕE TUDO
+   ============================================ */
+
+.custom-multiselect {
+    position: relative;
+    z-index: 1;
+}
+
+.custom-multiselect.open {
+    z-index: 999999 !important;
+}
+
+.custom-multiselect.open .multiselect-trigger {
+    border-color: #d1d5db !important;
+    box-shadow: 0 0 0 3px rgba(209, 213, 219, 0.1) !important;
+    background: white !important;
+    z-index: 999999 !important;
+}
+
+.multiselect-dropdown {
+    position: absolute !important;
+    top: calc(100% + 0.5rem) !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+    z-index: 1000000 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.custom-multiselect.open .multiselect-dropdown {
+    max-height: 320px !important;
+    overflow-y: auto !important;
+    padding: 0.5rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Garante que form-navigation fica sempre atrás */
+.form-navigation,
+.form-navigation *,
+.btn,
+.btn-primary,
+.btn-secondary {
+    position: relative;
+    z-index: 1 !important;
+}
+
+.calculator-card {
+    overflow: visible !important;
+}
+
+/* ============================================
+   2️⃣ BLOCO DE EXPLICAÇÃO DO CENÁRIO (AZUL)
+   ============================================ */
+
+#scenario-explanation {
+    display: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.scenario-explanation-block {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 1.25rem !important;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+    border: 2px solid #3b82f6 !important;
+    border-left: 4px solid #3b82f6 !important;
+    border-radius: 12px !important;
+    padding: 1.75rem 2rem !important;
+    margin: 0 !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2) !important;
+    opacity: 0 !important;
+    transform: translateY(10px) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.scenario-explanation-block.visible {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.scenario-explanation-block .explanation-icon {
+    flex-shrink: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: white !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2) !important;
+}
+
+.scenario-explanation-block .explanation-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    stroke: #3b82f6 !important;
+}
+
+.scenario-explanation-block .explanation-content {
+    flex: 1 !important;
+}
+
+.scenario-explanation-block .explanation-content h4 {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: #1e40af !important;
+    margin: 0 0 0.5rem 0 !important;
+    line-height: 1.3 !important;
+}
+
+.scenario-explanation-block .explanation-content p {
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+    color: #1e3a8a !important;
+    margin: 0 !important;
+}
+
+/* ============================================
+   3️⃣ POP-UPS DA METODOLOGIA (EMBAIXO DOS PILLS)
+   ============================================ */
+
+.scenario-category-compact {
+    display: block !important;
+    width: 100% !important;
+}
+
+#popup-renovation,
+#popup-newbuild {
+    display: block !important;
+    width: 100% !important;
+    grid-column: 1 / -1 !important;
+}
+
+.scenario-popup-container {
+    display: block !important;
+    width: 100% !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                margin 0.6s ease, 
+                opacity 0.6s ease !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+}
+
+.scenario-popup-container.visible {
+    max-height: 2000px !important;
+    margin: 1.5rem 0 0 0 !important;
+    opacity: 1 !important;
+}
+
+.scenario-detail-popup {
+    background: white;
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+    animation: slideDownPopup 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDownPopup {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   4️⃣ TABS DA METODOLOGIA (SEM FUNDO VERDE)
+   ============================================ */
+
+.tab-btn {
+    background: transparent !important;
+}
+
+.tab-btn:hover {
+    background: #f3f4f6 !important;
+}
+
+.tab-btn.active {
+    background: white !important;
+    color: #10b981 !important;
+}
+
+/* ============================================
+   5️⃣ COR VERMELHA MELHORADA (#dc2626)
+   ============================================ */
+
+:root {
+    --danger: #dc2626 !important;
+    --danger-light: #fee2e2 !important;
+    --danger-dark: #b91c1c !important;
+}
+
+.decision-badge-compact.demolish {
+    background: linear-gradient(to right, #dc2626 0%, #b91c1c 50%, #dc2626 100%) !important;
+}
+
+/* ============================================
+   6️⃣ RESPONSIVO
+   ============================================ */
+
+@media (max-width: 768px) {
+    .scenario-explanation-block {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .scenario-explanation-block .explanation-icon {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .scenario-explanation-block .explanation-content h4 {
         font-size: 1rem;
     }
     
-    .framework-content-bottom p {
-        font-size: 0.8rem;
+    .scenario-explanation-block .explanation-content p {
+        font-size: 0.875rem;
     }
+    
+    .multiselect-dropdown {
+        max-height: 250px !important;
+    }
+}
+
+/* ========================================
+   ✅ FIM DAS CORREÇÕES FINAIS
+   ======================================== */
+
+   /* ========================================
+   🔧 CORREÇÃO FINAL - 2026-03-01 23:59
+   ======================================== */
+
+/* 1️⃣ DROPDOWN - SOBREPÕE ABSOLUTAMENTE TUDO */
+.custom-multiselect {
+    position: relative !important;
+}
+
+.custom-multiselect.open {
+    z-index: 2147483647 !important; /* Máximo z-index possível */
+}
+
+.custom-multiselect.open .multiselect-trigger {
+    z-index: 2147483647 !important;
+    border-color: #d1d5db !important;
+    box-shadow: 0 0 0 3px rgba(209, 213, 219, 0.1) !important;
+}
+
+.multiselect-dropdown {
+    position: absolute !important;
+    top: calc(100% + 0.5rem) !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 2px solid #d1d5db !important;
+    border-radius: 8px !important;
+    box-shadow: 0 25px 100px rgba(0, 0, 0, 0.4) !important;
+    z-index: 2147483647 !important; /* Máximo z-index possível */
+    max-height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: all 0.3s ease !important;
+}
+
+.custom-multiselect.open .multiselect-dropdown {
+    max-height: 320px !important;
+    overflow-y: auto !important;
+    padding: 0.5rem !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* 2️⃣ BLOCO AZUL DE EXPLICAÇÃO */
+#scenario-explanation {
+    display: none;
+    width: 100%;
+    margin: 1.5rem 0 2rem 0;
+}
+
+.scenario-explanation-block {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+    border: 2px solid #3b82f6 !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2) !important;
+}
+
+.scenario-explanation-block .explanation-icon {
+    width: 40px !important;
+    height: 40px !important;
+    background: white !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.scenario-explanation-block .explanation-icon svg {
+    stroke: #3b82f6 !important;
+}
+
+.scenario-explanation-block .explanation-content h4 {
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: #1e40af !important;
+    margin: 0 0 0.5rem 0 !important;
+}
+
+.scenario-explanation-block .explanation-content p {
+    font-size: 0.9rem !important;
+    line-height: 1.6 !important;
+    color: #1e3a8a !important;
+    margin: 0 !important;
+}
+
+/* 3️⃣ POP-UPS - DESCRIÇÃO CURTA DESTACADA */
+.detail-description {
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+    color: #374151 !important;
+    margin-bottom: 1rem !important;
+    background: #f0fdf4 !important;
+    padding: 1rem !important;
+    border-radius: 8px !important;
+    border-left: 4px solid #10b981 !important;
+    font-weight: 500 !important;
+}
+
+/* ========================================
+   ✅ FIM
+   ======================================== */
+
+   /* ========================================
+   ✅ DROPDOWN Z-INDEX FIX DEFINITIVO
+   ======================================== */
+
+.custom-multiselect {
+    position: relative;
+    z-index: 10;
+}
+
+.custom-multiselect.open {
+    z-index: 999999 !important;
+}
+
+.multiselect-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000000 !important;
+}
+
+/* Força os campos de quantidade a ficarem SEMPRE abaixo */
+#material-quantities-container {
+    position: relative;
+    z-index: 1 !important;
+    margin-top: 1.5rem;
+}
+
+.material-quantity-item {
+    position: relative;
+    z-index: 1 !important;
+}
+
+/* Quando dropdown está aberto, desabilita pointer-events nos campos */
+body.dropdown-open #material-quantities-container {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+body.dropdown-open .custom-multiselect {
+    z-index: 999999 !important;
+}
+
+body.dropdown-open .multiselect-dropdown {
+    z-index: 1000000 !important;
+    pointer-events: auto;
 }

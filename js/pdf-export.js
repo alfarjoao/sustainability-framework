@@ -1,469 +1,795 @@
-/* ========================================
-   BUILDING SUSTAINABILITY FRAMEWORK
-   PDF Export Module - 4 Pages with 7 Scenarios
-   ======================================== */
+/**
+ * PDF EXPORT MODULE
+ * Building Sustainability Framework
+ * Generates comprehensive 4-page PDF report with charts and tables
+ * Supports 7 scenarios and new inline material selector
+ * ✅ UPDATED: Complete input summary including all user data
+ */
 
-document.addEventListener('DOMContentLoaded', function() {
-    const downloadBtn = document.getElementById('downloadPdfBtn');
-    
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', generatePDF);
+const PDFExportModule = (function() {
+    'use strict';
+
+    let resultsData = null;
+
+    /**
+     * Initialize PDF export
+     * @param {Object} data - Results data from calculator
+     */
+    function init(data) {
+        if (!data || !data.allScenarios || !Array.isArray(data.allScenarios)) {
+            console.error('PDFExport: Invalid data provided');
+            return;
+        }
+
+        resultsData = data;
+        console.log('✅ PDF Export initialized with complete data:', resultsData);
     }
-});
 
-async function generatePDF() {
-    const button = document.getElementById('downloadPdfBtn');
-    
-    // Disable button and show loading
-    button.disabled = true;
-    button.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1s linear infinite;">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-dasharray="60" stroke-dashoffset="20" opacity="0.25"/>
-        </svg>
-        Generating PDF...
-    `;
+    /**
+     * Check if required libraries are loaded
+     */
+    function checkDependencies() {
+        if (typeof html2canvas === 'undefined') {
+            console.error('PDFExport: html2canvas not loaded');
+            return false;
+        }
+        if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') {
+            console.error('PDFExport: jsPDF not loaded');
+            return false;
+        }
+        return true;
+    }
 
-    try {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 15;
-        const contentWidth = pageWidth - (margin * 2);
+    /**
+     * Generate and download PDF report
+     */
+    async function generatePDF() {
+        if (!resultsData) {
+            alert('No results data available. Please complete the calculation first.');
+            return;
+        }
 
-        // ====================================
-        // PAGE 1: HEADER + DECISION + RESULTS
-        // ====================================
+        if (!checkDependencies()) {
+            alert('PDF libraries not loaded. Please refresh the page and try again.');
+            return;
+        }
+
+        try {
+            // Show loading indicator
+            const exportBtn = document.querySelector('.export-btn, #btn-export-pdf');
+            const originalText = exportBtn ? exportBtn.innerHTML : '';
+            if (exportBtn) {
+                exportBtn.innerHTML = '<span class="btn-icon">⏳</span> Generating PDF...';
+                exportBtn.disabled = true;
+            }
+
+            // Initialize jsPDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin = 15;
+
+            // PAGE 1: Cover Page & Summary
+            await generateCoverPage(pdf, pageWidth, pageHeight, margin);
+
+            // PAGE 2: Complete Input Summary
+            pdf.addPage();
+            await generateInputSummaryPage(pdf, pageWidth, pageHeight, margin);
+
+            // PAGE 3: Detailed Results & Charts
+            pdf.addPage();
+            await generateResultsPage(pdf, pageWidth, pageHeight, margin);
+
+            // PAGE 4: Scenarios Comparison
+            pdf.addPage();
+            await generateComparisonPage(pdf, pageWidth, pageHeight, margin);
+
+            // PAGE 5: Methodology & Materials
+            pdf.addPage();
+            await generateMethodologyPage(pdf, pageWidth, pageHeight, margin);
+
+            // Save PDF
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const filename = `SustainaBuild_Report_${timestamp}.pdf`;
+            pdf.save(filename);
+
+            // Restore button
+            if (exportBtn) {
+                exportBtn.innerHTML = originalText;
+                exportBtn.disabled = false;
+            }
+
+            console.log('✅ PDF generated successfully (5 pages with complete data)');
+        } catch (error) {
+            console.error('PDFExport: Error generating PDF:', error);
+            alert('Failed to generate PDF. Please try again.');
+            
+            // Restore button
+            const exportBtn = document.querySelector('.export-btn, #btn-export-pdf');
+            if (exportBtn) {
+                exportBtn.innerHTML = '<span class="btn-icon">📄</span> Export PDF Report';
+                exportBtn.disabled = false;
+            }
+        }
+    }
+
+    /**
+     * PAGE 1: Cover Page & Summary
+     */
+    async function generateCoverPage(pdf, pageWidth, pageHeight, margin) {
+        let y = margin + 20;
+
+        // Logo/Title
+        pdf.setFillColor(4, 120, 87); // Primary green
+        pdf.rect(0, 0, pageWidth, 50, 'F');
         
-        // Header with dark green background
-        pdf.setFillColor(4, 120, 87); // #047857
-        pdf.rect(0, 0, pageWidth, 40, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(28);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('SustainaBuild', pageWidth / 2, 25, { align: 'center' });
         
-        // Title
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Building Carbon Assessment Report', pageWidth / 2, 35, { align: 'center' });
+
+        y = 70;
+        pdf.setTextColor(0, 0, 0);
+
+        // Decision Box
+        const decision = resultsData.decision;
+        const boxHeight = 40;
+        
+        if (decision === 'RENOVATE') {
+            pdf.setFillColor(16, 185, 129); // Green
+        } else {
+            pdf.setFillColor(239, 68, 68); // Red
+        }
+        
+        pdf.roundedRect(margin, y, pageWidth - 2 * margin, boxHeight, 3, 3, 'F');
+        
         pdf.setTextColor(255, 255, 255);
         pdf.setFontSize(24);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('SustainaBuild', margin, 20);
+        pdf.text(`Recommendation: ${decision}`, pageWidth / 2, y + 15, { align: 'center' });
         
-        pdf.setFontSize(12);
+        pdf.setFontSize(16);
         pdf.setFont('helvetica', 'normal');
-        pdf.text('Carbon Analysis Report (7 Scenarios)', margin, 28);
-        
-        // Generation date
-        const today = new Date().toLocaleDateString('en-GB', { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric' 
-        });
-        pdf.setFontSize(10);
-        pdf.text('Generated: ' + today, pageWidth - margin - 40, 28);
+        const savingsText = `${resultsData.savingsPercent}% Carbon Savings`;
+        pdf.text(savingsText, pageWidth / 2, y + 30, { align: 'center' });
 
-        // Reset text color
-        pdf.setTextColor(31, 41, 55);
+        y += boxHeight + 20;
+        pdf.setTextColor(0, 0, 0);
 
-        // Decision Badge
-        const decisionText = document.getElementById('decisionText')?.textContent || 'RENOVATE';
-        const resultsTitle = document.getElementById('resultsTitle')?.textContent || 'Renovation is the better choice';
-        
-        const isRenovate = decisionText === 'RENOVATE';
-        pdf.setFillColor(isRenovate ? 4 : 220, isRenovate ? 120 : 38, isRenovate ? 87 : 38);
-        pdf.roundedRect(margin, 50, contentWidth, 20, 3, 3, 'F');
-        
-        pdf.setTextColor(255, 255, 255);
+        // Quick Project Summary
         pdf.setFontSize(16);
         pdf.setFont('helvetica', 'bold');
-        pdf.text(decisionText, margin + 5, 58);
-        
+        pdf.text('Project Overview', margin, y);
+        y += 10;
+
         pdf.setFontSize(11);
         pdf.setFont('helvetica', 'normal');
-        pdf.text(resultsTitle, margin + 5, 65);
-
-        // Savings
-        const savingsAmount = document.getElementById('savingsAmount')?.textContent || '0 tCO₂e';
-        const savingsPercent = document.getElementById('savingsPercent')?.textContent || '(0%)';
         
-        pdf.setTextColor(31, 41, 55);
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Carbon Savings:', margin, 85);
-        
-        pdf.setFontSize(14);
-        pdf.setTextColor(4, 120, 87);
-        pdf.text(savingsAmount + ' ' + savingsPercent, margin, 93);
-
-        // Results Title
-        pdf.setTextColor(31, 41, 55);
-        pdf.setFontSize(14);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Carbon Comparison Results', margin, 110);
-
-        // Quick Stats
-        const renovationTotal = document.getElementById('renovationTotal')?.textContent || '0';
-        const newbuildTotal = document.getElementById('newbuildTotal')?.textContent || '0';
-        
-        // Renovation box
-        pdf.setFillColor(220, 252, 231); // Light green
-        pdf.setDrawColor(4, 120, 87); // Dark green border
-        pdf.setLineWidth(0.5);
-        pdf.roundedRect(margin, 120, (contentWidth / 2) - 5, 30, 2, 2, 'FD');
-        
-        pdf.setFontSize(10);
-        pdf.setTextColor(4, 120, 87);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Best Renovation', margin + 5, 128);
-        
-        pdf.setFontSize(18);
-        pdf.text(renovationTotal + ' tCO₂e', margin + 5, 140);
-
-        // New Build box
-        pdf.setFillColor(224, 242, 254); // Light blue
-        pdf.setDrawColor(14, 165, 233); // Blue border
-        pdf.roundedRect(margin + (contentWidth / 2) + 5, 120, (contentWidth / 2) - 5, 30, 2, 2, 'FD');
-        
-        pdf.setTextColor(14, 165, 233);
-        pdf.text('Best New Build', margin + (contentWidth / 2) + 10, 128);
-        
-        pdf.setFontSize(18);
-        pdf.text(newbuildTotal + ' tCO₂e', margin + (contentWidth / 2) + 10, 140);
-
-        // Breakdown
-        pdf.setTextColor(31, 41, 55);
-        pdf.setFontSize(12);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Detailed Breakdown', margin, 165);
-
-        const renovationEmbodied = document.getElementById('renovationEmbodied')?.textContent || '0';
-        const renovationOperational = document.getElementById('renovationOperational')?.textContent || '0';
-        const newbuildEmbodied = document.getElementById('newbuildEmbodied')?.textContent || '0';
-        const newbuildOperational = document.getElementById('newbuildOperational')?.textContent || '0';
-
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        
-        // Renovation breakdown
-        pdf.text('Best Renovation:', margin, 175);
-        pdf.text('  • Embodied: ' + renovationEmbodied + ' tCO₂e', margin, 182);
-        pdf.text('  • Operational: ' + renovationOperational + ' tCO₂e', margin, 189);
-        
-        // New Build breakdown
-        pdf.text('Best New Build:', margin, 202);
-        pdf.text('  • Embodied: ' + newbuildEmbodied + ' tCO₂e', margin, 209);
-        pdf.text('  • Operational: ' + newbuildOperational + ' tCO₂e', margin, 216);
-
-        // Footer
-        pdf.setFontSize(8);
-        pdf.setTextColor(107, 114, 128);
-        pdf.text('SustainaBuild © 2026 | Research by Valentine Lhoest | Development by João Alfar', 
-                 pageWidth / 2, pageHeight - 10, { align: 'center' });
-
-        // ====================================
-        // PAGE 2: COMPARISON TABLE (7 SCENARIOS) ✅ CORRIGIDO
-        // ====================================
-        
-        pdf.addPage();
-        
-        // Header
-        pdf.setFillColor(4, 120, 87);
-        pdf.rect(0, 0, pageWidth, 30, 'F');
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(16);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('7 Scenarios Comparison Table', margin, 18); // ✅ MUDADO DE 6 PARA 7
-
-        // Capture table
-        const tableElement = document.getElementById('comparisonTable');
-        
-        if (tableElement) {
-            try {
-                // Switch to table tab to ensure it's visible
-                const tableTab = document.querySelector('[data-tab="table"]');
-                if (tableTab) tableTab.click();
-                
-                await new Promise(resolve => setTimeout(resolve, 400));
-                
-                const canvas = await html2canvas(tableElement, {
-                    scale: 2,
-                    backgroundColor: '#ffffff',
-                    logging: false,
-                    useCORS: true
-                });
-                
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = contentWidth;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                let yPosition = 40;
-                
-                // Se a tabela for muito grande, ajusta o tamanho
-                if (imgHeight > pageHeight - 60) {
-                    const scaledHeight = pageHeight - 60;
-                    const scaledWidth = (canvas.width * scaledHeight) / canvas.height;
-                    pdf.addImage(imgData, 'PNG', margin, yPosition, scaledWidth, scaledHeight);
-                } else {
-                    pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight);
-                }
-                
-            } catch (error) {
-                console.error('Error capturing table:', error);
-                pdf.setTextColor(220, 38, 38);
-                pdf.setFontSize(10);
-                pdf.text('Error: Could not capture comparison table', margin, 50);
-            }
-        } else {
-            pdf.setTextColor(220, 38, 38);
-            pdf.setFontSize(10);
-            pdf.text('Error: Comparison table not found', margin, 50);
-        }
-
-        // Footer ✅ CORRIGIDO
-        pdf.setFontSize(8);
-        pdf.setTextColor(107, 114, 128);
-        pdf.text('Page 2 of 4 | SustainaBuild Carbon Analysis Report (7 Scenarios)', 
-                 pageWidth / 2, pageHeight - 10, { align: 'center' });
-
-        // ====================================
-        // PAGE 3: BAR CHART + PIE CHART ✅ CORRIGIDO
-        // ====================================
-        
-        pdf.addPage();
-        
-        // Header
-        pdf.setFillColor(4, 120, 87);
-        pdf.rect(0, 0, pageWidth, 30, 'F');
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(16);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Visual Analysis (7 Scenarios)', margin, 18); // ✅ MUDADO DE 6 PARA 7
-
-        // Bar Chart
-        const barChartElement = document.getElementById('barChart');
-        if (barChartElement) {
-            try {
-                // Switch to comparison tab
-                const comparisonTab = document.querySelector('[data-tab="comparison"]');
-                if (comparisonTab) comparisonTab.click();
-                
-                await new Promise(resolve => setTimeout(resolve, 400));
-                
-                const canvas = await html2canvas(barChartElement.parentElement, {
-                    scale: 2,
-                    backgroundColor: '#ffffff',
-                    logging: false
-                });
-                
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = contentWidth;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'PNG', margin, 40, imgWidth, Math.min(imgHeight, 110));
-                
-            } catch (error) {
-                console.error('Error capturing bar chart:', error);
-            }
-        }
-
-        // Pie Chart
-        const pieChartElement = document.getElementById('pieChart');
-        if (pieChartElement) {
-            try {
-                // Switch to breakdown tab
-                const breakdownTab = document.querySelector('[data-tab="breakdown"]');
-                if (breakdownTab) breakdownTab.click();
-                
-                await new Promise(resolve => setTimeout(resolve, 400));
-                
-                const canvas = await html2canvas(pieChartElement.parentElement, {
-                    scale: 2,
-                    backgroundColor: '#ffffff',
-                    logging: false
-                });
-                
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = contentWidth;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'PNG', margin, 160, imgWidth, Math.min(imgHeight, 110));
-                
-            } catch (error) {
-                console.error('Error capturing pie chart:', error);
-            }
-        }
-
-        // Footer
-        pdf.setFontSize(8);
-        pdf.setTextColor(107, 114, 128);
-        pdf.text('Page 3 of 4 | SustainaBuild Carbon Analysis Report', 
-                 pageWidth / 2, pageHeight - 10, { align: 'center' });
-
-        // ====================================
-        // PAGE 4: LINE CHART + BUILDING INPUTS
-        // ====================================
-        
-        pdf.addPage();
-        
-        // Header
-        pdf.setFillColor(4, 120, 87);
-        pdf.rect(0, 0, pageWidth, 30, 'F');
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFontSize(16);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Timeline & Building Inputs', margin, 18);
-
-        // Line Chart
-        const lineChartElement = document.getElementById('lineChart');
-        if (lineChartElement) {
-            try {
-                // Switch to timeline tab
-                const timelineTab = document.querySelector('[data-tab="timeline"]');
-                if (timelineTab) timelineTab.click();
-                
-                await new Promise(resolve => setTimeout(resolve, 400));
-                
-                const canvas = await html2canvas(lineChartElement.parentElement, {
-                    scale: 2,
-                    backgroundColor: '#ffffff',
-                    logging: false
-                });
-                
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = contentWidth;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
-                pdf.addImage(imgData, 'PNG', margin, 40, imgWidth, Math.min(imgHeight, 100));
-                
-            } catch (error) {
-                console.error('Error capturing line chart:', error);
-            }
-        }
-
-        // Building Inputs Summary
-        pdf.setTextColor(31, 41, 55);
-        pdf.setFontSize(12);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Building Inputs Summary', margin, 160);
-
-        // ✅ LER MATERIAIS DO CUSTOM DROPDOWN
-        const materialDropdown = document.getElementById('material-dropdown');
-        let selectedMaterials = 'N/A';
-        if (materialDropdown) {
-            const checkedBoxes = materialDropdown.querySelectorAll('input[type="checkbox"]:checked');
-            if (checkedBoxes.length > 0) {
-                selectedMaterials = Array.from(checkedBoxes)
-                    .map(cb => cb.value.charAt(0).toUpperCase() + cb.value.slice(1))
-                    .join(', ');
-            }
-        }
-
-        const buildingType = document.getElementById('building-type')?.value || 'N/A';
-        const buildingArea = document.getElementById('building-area')?.value || 'N/A';
-        const lifespan = document.getElementById('lifespan')?.value || 'N/A';
-        const climateZone = document.getElementById('climate-zone')?.value || 'N/A';
-        const embodiedEnergy = document.getElementById('embodied-energy')?.value || 'N/A';
-        const operationalEnergy = document.getElementById('operational-energy')?.value || 'N/A';
-        const reuseRate = document.getElementById('reuse-rate')?.value || 'N/A';
-
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'normal');
-        
-        let yPos = 170;
-        const inputs = [
-            ['Building Type:', buildingType === 'N/A' ? buildingType : buildingType.charAt(0).toUpperCase() + buildingType.slice(1).replace('-', ' ')],
-            ['Building Area:', buildingArea + ' m²'],
-            ['Expected Lifespan:', lifespan + ' years'],
-            ['Structural Materials:', selectedMaterials],
-            ['Climate Zone:', climateZone === 'N/A' ? climateZone : climateZone.charAt(0).toUpperCase() + climateZone.slice(1)],
-            ['Embodied Energy:', embodiedEnergy === 'unknown' ? 'Estimated' : embodiedEnergy + ' kgCO₂/m²'],
-            ['Operational Energy:', operationalEnergy === 'unknown' ? 'Estimated' : operationalEnergy + ' kWh/m²/yr'],
-            ['Material Reuse Rate:', reuseRate + '%']
+        const details = [
+            ['Building Type:', capitalizeFirst(resultsData.inputs.buildingType || 'N/A')],
+            ['Program After Renovation:', capitalizeFirst(resultsData.inputs.programAfterRenovation || 'N/A')],
+            ['Floor Area:', `${(resultsData.inputs.buildingArea || 0).toLocaleString()} m²`],
+            ['Climate Zone:', capitalizeFirst(resultsData.inputs.climate || 'N/A')],
+            ['Total Materials:', `${(resultsData.inputs.totalMaterialQuantity || 0).toLocaleString()} tonnes`]
         ];
 
-        inputs.forEach(([label, value]) => {
+        details.forEach(([label, value]) => {
             pdf.setFont('helvetica', 'bold');
-            pdf.text(label, margin, yPos);
+            pdf.text(label, margin, y);
             pdf.setFont('helvetica', 'normal');
-            
-            // Wrap text se for muito longo
-            const maxWidth = contentWidth - 65;
-            const splitValue = pdf.splitTextToSize(value, maxWidth);
-            pdf.text(splitValue, margin + 65, yPos);
-            
-            yPos += (splitValue.length * 5) + 2;
+            pdf.text(value, margin + 65, y);
+            y += 7;
         });
 
-        // Methodology Note
-        pdf.setFillColor(254, 243, 199); // Yellow background
-        pdf.roundedRect(margin, yPos + 5, contentWidth, 40, 2, 2, 'F');
-        
-        pdf.setTextColor(180, 83, 9);
-        pdf.setFontSize(9);
+        // Best Scenarios
+        y += 15;
+        pdf.setFontSize(16);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('Methodology:', margin + 3, yPos + 13);
+        pdf.text('Optimal Scenarios', margin, y);
+        y += 10;
+
+        pdf.setFontSize(11);
         
+        const best = resultsData.bestRenovation;
+        const bestNew = resultsData.bestNewbuild;
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Best Renovation:', margin, y);
         pdf.setFont('helvetica', 'normal');
-        pdf.setTextColor(120, 53, 15);
-        const methodologyText = 'This analysis evaluates 7 scenarios (Light, Medium, Deep Renovation, Deep + Slight Demolition vs Code-Compliant, High-Performance, Low-Carbon New Build) using whole-life carbon methodology. Results based on research by Valentine Lhoest.';
-        const splitText = pdf.splitTextToSize(methodologyText, contentWidth - 10);
-        pdf.text(splitText, margin + 3, yPos + 20);
+        pdf.text(`${best.displayName}`, margin + 40, y);
+        y += 6;
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`Total: ${(best.totalCarbon / 1000).toFixed(1)} tCO₂e over ${best.lifespan} years`, margin + 5, y);
+        y += 10;
+        pdf.setTextColor(0, 0, 0);
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Best New Build:', margin, y);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${bestNew.displayName}`, margin + 40, y);
+        y += 6;
+        pdf.setTextColor(100, 100, 100);
+        pdf.text(`Total: ${(bestNew.totalCarbon / 1000).toFixed(1)} tCO₂e over ${bestNew.lifespan} years`, margin + 5, y);
 
         // Footer
-        pdf.setFontSize(8);
-        pdf.setTextColor(107, 114, 128);
-        pdf.text('Page 4 of 4 | SustainaBuild Carbon Analysis Report | sustainabuild.com', 
-                 pageWidth / 2, pageHeight - 10, { align: 'center' });
-
-        // ====================================
-        // SAVE PDF
-        // ====================================
-        
-        const filename = 'SustainaBuild_Report_7Scenarios_' + 
-                        today.replace(/\//g, '-') + '.pdf';
-        
-        pdf.save(filename);
-
-        // Success message
-        showSuccessMessage('PDF downloaded successfully!');
-
-    } catch (error) {
-        console.error('PDF generation error:', error);
-        alert('Error generating PDF. Please try again.');
-    } finally {
-        // Reset button
-        button.disabled = false;
-        button.innerHTML = `
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Download PDF
-        `;
+        y = pageHeight - 20;
+        pdf.setFontSize(9);
+        pdf.setTextColor(128, 128, 128);
+        const date = new Date().toLocaleDateString();
+        pdf.text(`Generated on ${date} by SustainaBuild Framework`, pageWidth / 2, y, { align: 'center' });
+        pdf.text('Page 1 of 5', pageWidth / 2, y + 5, { align: 'center' });
     }
+
+    /**
+     * PAGE 2: Complete Input Summary
+     */
+    async function generateInputSummaryPage(pdf, pageWidth, pageHeight, margin) {
+        let y = margin;
+
+        // Header
+        pdf.setFontSize(18);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(4, 120, 87);
+        pdf.text('Complete Input Summary', margin, y);
+        y += 15;
+
+        const inputs = resultsData.inputs;
+
+        // SECTION 1: Building Information
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(0, 0, 0);
+        pdf.text('Building Information', margin, y);
+        y += 8;
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        const buildingInfo = [
+            ['Building Type:', capitalizeFirst(inputs.buildingType || 'N/A')],
+            ['Program After Renovation:', capitalizeFirst(inputs.programAfterRenovation || 'N/A')],
+            ['Building Area:', `${(inputs.buildingArea || 0).toLocaleString()} m²`],
+            ['Recommended Lifespan:', `${inputs.lifespan || 0} years`]
+        ];
+
+        buildingInfo.forEach(([label, value]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label, margin + 5, y);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value, margin + 75, y);
+            y += 6;
+        });
+
+        y += 10;
+
+        // SECTION 2: Environmental Context
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Environmental Context', margin, y);
+        y += 8;
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        const climateLabels = {
+            'temperate': 'Temperate',
+            'cold': 'Cold',
+            'hot-dry': 'Hot & Dry',
+            'hot-humid': 'Hot & Humid',
+            'coastal': 'Coastal',
+            'mountain': 'Mountain'
+        };
+
+        const envContext = [
+            ['Climate Zone:', climateLabels[inputs.climate] || capitalizeFirst(inputs.climate || 'N/A')],
+            ['Climate Multiplier:', inputs.climateFactor ? inputs.climateFactor.toFixed(2) : 'N/A'],
+            ['Embodied Energy Base:', inputs.embodiedEnergy ? `${inputs.embodiedEnergy.toFixed(2)} MJ/m²` : 'N/A']
+        ];
+
+        envContext.forEach(([label, value]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label, margin + 5, y);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value, margin + 75, y);
+            y += 6;
+        });
+
+        y += 10;
+
+        // SECTION 3: Energy Baselines
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Energy Baselines', margin, y);
+        y += 8;
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        const energyBaselines = [
+            ['Program Baseline:', `${inputs.programBaseline || 0} kWh/m²/yr`],
+            ['Program Factor:', inputs.programFactor ? inputs.programFactor.toFixed(2) : 'N/A']
+        ];
+
+        energyBaselines.forEach(([label, value]) => {
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(label, margin + 5, y);
+            pdf.setFont('helvetica', 'normal');
+            pdf.text(value, margin + 75, y);
+            y += 6;
+        });
+
+        y += 10;
+
+        // SECTION 4: Materials & Quantities
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Materials & Quantities', margin, y);
+        y += 8;
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Total Material Quantity:', margin + 5, y);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${(inputs.totalMaterialQuantity || 0).toLocaleString()} tonnes`, margin + 75, y);
+        y += 6;
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Material Factor:', margin + 5, y);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(inputs.materialFactor ? inputs.materialFactor.toFixed(2) : 'N/A', margin + 75, y);
+        y += 10;
+
+        // Material breakdown table
+        if (inputs.materials && inputs.materials.length > 0) {
+            pdf.setFontSize(12);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('Material Breakdown:', margin + 5, y);
+            y += 8;
+
+            // Table header
+            pdf.setFillColor(4, 120, 87);
+            pdf.rect(margin + 5, y, 80, 8, 'F');
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(9);
+            pdf.text('Material', margin + 8, y + 5);
+            pdf.text('Quantity (tonnes)', margin + 50, y + 5);
+            y += 8;
+
+            // Table rows
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFont('helvetica', 'normal');
+            
+            inputs.materials.forEach((mat, index) => {
+                const fillColor = index % 2 === 0 ? [249, 250, 251] : [255, 255, 255];
+                pdf.setFillColor(...fillColor);
+                pdf.rect(margin + 5, y, 80, 7, 'F');
+                
+                const qty = inputs.materialQuantities?.[mat] || 0;
+                pdf.text(capitalizeFirst(mat), margin + 8, y + 5);
+                pdf.text(qty.toLocaleString(), margin + 50, y + 5);
+                y += 7;
+            });
+        } else {
+            pdf.setFont('helvetica', 'italic');
+            pdf.setTextColor(100, 100, 100);
+            pdf.text('No materials specified', margin + 5, y);
+        }
+
+        // Footer
+        pdf.setFontSize(9);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text('Page 2 of 5', pageWidth / 2, pageHeight - 15, { align: 'center' });
+    }
+
+    /**
+     * PAGE 3: Detailed Results & Charts
+     */
+    async function generateResultsPage(pdf, pageWidth, pageHeight, margin) {
+        let y = margin;
+
+        // Header
+        pdf.setFontSize(18);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(4, 120, 87);
+        pdf.text('Detailed Carbon Analysis', margin, y);
+        y += 12;
+
+        // Capture bar chart
+        const chartCanvas = document.querySelector('#barChart');
+        if (chartCanvas) {
+            try {
+                const chartImage = await html2canvas(chartCanvas.parentElement, {
+                    scale: 2,
+                    backgroundColor: '#ffffff'
+                });
+                
+                const imgData = chartImage.toDataURL('image/png');
+                const imgWidth = pageWidth - 2 * margin;
+                const imgHeight = (chartImage.height * imgWidth) / chartImage.width;
+                
+                pdf.addImage(imgData, 'PNG', margin, y, imgWidth, Math.min(imgHeight, 100));
+                y += Math.min(imgHeight, 100) + 10;
+            } catch (error) {
+                console.warn('Could not capture bar chart:', error);
+                y += 10;
+            }
+        }
+
+        // Scenarios Table (Top 4)
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Top 4 Scenarios (Lowest Carbon)', margin, y);
+        y += 8;
+
+        const sorted = [...resultsData.allScenarios].sort((a, b) => a.totalCarbon - b.totalCarbon);
+        const top4 = sorted.slice(0, 4);
+
+        pdf.setFontSize(9);
+        const colWidths = [60, 35, 35, 35];
+        const rowHeight = 8;
+
+        // Table header
+        pdf.setFillColor(4, 120, 87);
+        pdf.setTextColor(255, 255, 255);
+        pdf.rect(margin, y, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'F');
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Scenario', margin + 2, y + 5);
+        pdf.text('Embodied', margin + colWidths[0] + 2, y + 5);
+        pdf.text('Operational', margin + colWidths[0] + colWidths[1] + 2, y + 5);
+        pdf.text('Total', margin + colWidths[0] + colWidths[1] + colWidths[2] + 2, y + 5);
+        y += rowHeight;
+
+        // Table rows
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal');
+        
+        top4.forEach((scenario, index) => {
+            const fillColor = index % 2 === 0 ? [249, 250, 251] : [255, 255, 255];
+            pdf.setFillColor(...fillColor);
+            pdf.rect(margin, y, colWidths.reduce((a, b) => a + b, 0), rowHeight, 'F');
+            
+            pdf.text(scenario.displayName, margin + 2, y + 5);
+            pdf.text(`${(scenario.embodiedCarbon / 1000).toFixed(1)} t`, margin + colWidths[0] + 2, y + 5);
+            pdf.text(`${(scenario.operationalCarbon / 1000).toFixed(1)} t`, margin + colWidths[0] + colWidths[1] + 2, y + 5);
+            pdf.text(`${(scenario.totalCarbon / 1000).toFixed(1)} t`, margin + colWidths[0] + colWidths[1] + colWidths[2] + 2, y + 5);
+            y += rowHeight;
+        });
+
+        // Key Insights
+        y += 10;
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(4, 120, 87);
+        pdf.text('Key Insights', margin, y);
+        y += 8;
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        
+        const insights = generateInsights(resultsData);
+        insights.forEach(insight => {
+            const lines = pdf.splitTextToSize(`• ${insight}`, pageWidth - 2 * margin - 5);
+            lines.forEach(line => {
+                pdf.text(line, margin + 5, y);
+                y += 5;
+            });
+            y += 2;
+        });
+
+        // Footer
+        pdf.setFontSize(9);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text('Page 3 of 5', pageWidth / 2, pageHeight - 15, { align: 'center' });
+    }
+
+    /**
+     * PAGE 4: Scenarios Comparison
+     */
+    async function generateComparisonPage(pdf, pageWidth, pageHeight, margin) {
+        let y = margin;
+
+        // Header
+        pdf.setFontSize(18);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(4, 120, 87);
+        pdf.text('Complete Scenarios Comparison', margin, y);
+        y += 12;
+
+        // Full comparison table
+        pdf.setFontSize(8);
+        const colWidths = [55, 20, 20, 20, 20, 20];
+        const rowHeight = 7;
+
+        // Header row
+        pdf.setFillColor(4, 120, 87);
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFont('helvetica', 'bold');
+        
+        const totalWidth = colWidths.reduce((a, b) => a + b, 0);
+        pdf.rect(margin, y, totalWidth, rowHeight, 'F');
+        
+        pdf.text('Scenario', margin + 2, y + 5);
+        pdf.text('Embodied', margin + colWidths[0] + 2, y + 5);
+        pdf.text('Operational', margin + colWidths[0] + colWidths[1] + 2, y + 5);
+        pdf.text('Total', margin + colWidths[0] + colWidths[1] + colWidths[2] + 2, y + 5);
+        pdf.text('Lifespan', margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 2, y + 5);
+        pdf.text('Category', margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + 2, y + 5);
+        y += rowHeight;
+
+        // Data rows
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFont('helvetica', 'normal');
+        
+        resultsData.allScenarios.forEach((scenario, index) => {
+            const fillColor = index % 2 === 0 ? [249, 250, 251] : [255, 255, 255];
+            pdf.setFillColor(...fillColor);
+            pdf.rect(margin, y, totalWidth, rowHeight, 'F');
+            
+            pdf.text(scenario.displayName, margin + 2, y + 5);
+            pdf.text(`${(scenario.embodiedCarbon / 1000).toFixed(1)}`, margin + colWidths[0] + 2, y + 5);
+            pdf.text(`${(scenario.operationalCarbon / 1000).toFixed(1)}`, margin + colWidths[0] + colWidths[1] + 2, y + 5);
+            pdf.text(`${(scenario.totalCarbon / 1000).toFixed(1)}`, margin + colWidths[0] + colWidths[1] + colWidths[2] + 2, y + 5);
+            pdf.text(`${scenario.lifespan}y`, margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + 2, y + 5);
+            pdf.text(scenario.category, margin + colWidths[0] + colWidths[1] + colWidths[2] + colWidths[3] + colWidths[4] + 2, y + 5);
+            y += rowHeight;
+        });
+
+        // Renovation vs New Build Analysis
+        y += 15;
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(4, 120, 87);
+        pdf.text('Renovation vs New Build Analysis', margin, y);
+        y += 10;
+
+        const renovations = resultsData.allScenarios.filter(s => s.category === 'renovation');
+        const newBuilds = resultsData.allScenarios.filter(s => s.category === 'newbuild');
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+
+        const avgRenov = renovations.reduce((sum, s) => sum + s.totalCarbon, 0) / renovations.length;
+        const avgNew = newBuilds.reduce((sum, s) => sum + s.totalCarbon, 0) / newBuilds.length;
+
+        pdf.text(`Average Renovation Carbon: ${(avgRenov / 1000).toFixed(1)} tCO₂e`, margin, y);
+        y += 7;
+        pdf.text(`Average New Build Carbon: ${(avgNew / 1000).toFixed(1)} tCO₂e`, margin, y);
+        y += 7;
+        pdf.text(`Difference: ${((avgNew - avgRenov) / 1000).toFixed(1)} tCO₂e (${(((avgNew - avgRenov) / avgNew) * 100).toFixed(1)}%)`, margin, y);
+
+        // Footer
+        pdf.setFontSize(9);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text('Page 4 of 5', pageWidth / 2, pageHeight - 15, { align: 'center' });
+    }
+
+    /**
+     * PAGE 5: Methodology & Materials
+     */
+    async function generateMethodologyPage(pdf, pageWidth, pageHeight, margin) {
+        let y = margin;
+
+        // Header
+        pdf.setFontSize(18);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(4, 120, 87);
+        pdf.text('Methodology & Assumptions', margin, y);
+        y += 12;
+
+        // Calculation Methodology
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(0, 0, 0);
+        pdf.text('Calculation Methodology', margin, y);
+        y += 8;
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        
+        const methodology = [
+            'Embodied Carbon: Calculated based on material quantities, construction context, and scenario-specific reuse rates and embodied factors. Material-specific carbon intensities are applied.',
+            'Operational Carbon: Derived from building type baseline energy use (kWh/m²/yr), adjusted for climate zone multipliers, program factors, and scenario-specific performance improvements over the specified lifespan.',
+            'Total Carbon: Sum of embodied and operational carbon emissions over the specified lifespan of each scenario, expressed in tCO₂e.',
+            'Decision Logic: Compares the best renovation scenario against the best new build scenario. Recommends RENOVATE if renovation total carbon is lower; otherwise recommends DEMOLISH & REBUILD.',
+            'Data Sources: Embodied carbon factors from ICE database v3.0; operational energy baselines from ASHRAE 90.1 and local standards; climate multipliers from regional studies.'
+        ];
+
+        methodology.forEach(text => {
+            const lines = pdf.splitTextToSize(`• ${text}`, pageWidth - 2 * margin - 5);
+            lines.forEach(line => {
+                pdf.text(line, margin + 5, y);
+                y += 5;
+            });
+            y += 3;
+        });
+
+        // Scenario Descriptions
+        y += 8;
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Scenario Descriptions', margin, y);
+        y += 8;
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        
+        const scenarioDescriptions = [
+            'Light Renovation: Minimal intervention, 90% reuse, 10% embodied factor, 25% operational improvement, 17.5-year lifespan.',
+            'Medium Renovation: Moderate upgrade, 70% reuse, 27.5% embodied factor, 47.5% operational improvement, 22.5-year lifespan.',
+            'Deep Renovation: Extensive intervention, 52.5% reuse, 45% embodied factor, 70% operational improvement, 30-year lifespan.',
+            'Deep + Demo: Selective demolition + deep renovation, 42.5% reuse, 55% embodied factor, 75% operational improvement, 35-year lifespan.',
+            'Code-Compliant New: Minimum code compliance, 2.5% reuse, 97.5% embodied factor, 84% operational improvement, 40-year lifespan.',
+            'High-Performance New: Advanced systems, 10% reuse, 82.5% embodied factor, 94% operational improvement, 50-year lifespan.',
+            'Low-Carbon New: Net-zero ready, 22.5% reuse, 65% embodied factor, 98% operational improvement, 60-year lifespan.'
+        ];
+
+        scenarioDescriptions.forEach(desc => {
+            const lines = pdf.splitTextToSize(`• ${desc}`, pageWidth - 2 * margin - 5);
+            lines.forEach(line => {
+                pdf.text(line, margin + 5, y);
+                y += 4;
+            });
+            y += 2;
+        });
+
+        // Limitations
+        y += 8;
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(4, 120, 87);
+        pdf.text('Limitations & Disclaimer', margin, y);
+        y += 8;
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(0, 0, 0);
+        
+        const disclaimer = 'This assessment provides preliminary estimates based on simplified assumptions and industry-standard factors. Actual carbon emissions may vary significantly based on specific project details, local conditions, material sourcing, supply chain practices, construction methods, occupant behavior, and operational practices. This report should be used for comparative analysis and initial decision-making only. Detailed life cycle assessments (LCA) and project-specific analysis by qualified professionals are strongly recommended for final decisions and regulatory compliance.';
+        
+        const disclaimerLines = pdf.splitTextToSize(disclaimer, pageWidth - 2 * margin);
+        disclaimerLines.forEach(line => {
+            pdf.text(line, margin, y);
+            y += 4;
+        });
+
+        // Footer
+        y = pageHeight - 30;
+        pdf.setFillColor(4, 120, 87);
+        pdf.rect(0, y, pageWidth, 20, 'F');
+        
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('SustainaBuild Framework', pageWidth / 2, y + 8, { align: 'center' });
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Building a sustainable future, one decision at a time', pageWidth / 2, y + 14, { align: 'center' });
+
+        pdf.setFontSize(9);
+        pdf.setTextColor(200, 200, 200);
+        pdf.text('Page 5 of 5', pageWidth / 2, pageHeight - 15, { align: 'center' });
+    }
+
+    // Helper Functions
+
+    function capitalizeFirst(str) {
+        if (!str) return '';
+        return str.charAt(0).toUpperCase() + str.slice(1).replace(/-/g, ' ');
+    }
+
+    function generateInsights(data) {
+        const insights = [];
+        const best = data.bestRenovation;
+        const bestNew = data.bestNewbuild;
+        
+        insights.push(`The ${best.displayName} scenario achieves the lowest carbon footprint among renovation options at ${(best.totalCarbon / 1000).toFixed(1)} tCO₂e over ${best.lifespan} years.`);
+        
+        insights.push(`Compared to the best new build option (${bestNew.displayName}), the recommended scenario saves ${data.savingsPercent}% in total carbon emissions.`);
+        
+        const embodiedPercent = (best.embodiedCarbon / best.totalCarbon * 100).toFixed(0);
+        insights.push(`Embodied carbon represents ${embodiedPercent}% of total carbon in the recommended scenario, highlighting the importance of material selection and reuse.`);
+        
+        if (data.inputs.buildingArea) {
+            const carbonPerM2 = (best.totalCarbon / data.inputs.buildingArea).toFixed(1);
+            insights.push(`Carbon intensity for the recommended scenario is ${carbonPerM2} kgCO₂e/m² over the project lifespan.`);
+        }
+
+        if (data.inputs.totalMaterialQuantity) {
+            insights.push(`Total materials specified: ${data.inputs.totalMaterialQuantity.toLocaleString()} tonnes across ${data.inputs.materials.length} material types.`);
+        }
+
+        return insights;
+    }
+
+    // Public API
+    return {
+        init,
+        generatePDF
+    };
+})();
+
+// Expose globally
+window.PDFExportModule = PDFExportModule;
+
+// Auto-attach to export button
+document.addEventListener('DOMContentLoaded', () => {
+    const exportBtn = document.querySelector('.export-btn, #btn-export-pdf');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            PDFExportModule.generatePDF();
+        });
+        console.log('✅ PDF Export button attached');
+    }
+});
+
+// ✅ MELHOR HANDLING DE EVENTOS - Adiciona no final do arquivo
+
+// Tenta anexar o evento de várias formas
+function attachExportButton() {
+    console.log('🔍 Procurando botão de export PDF...');
+    
+    // Possíveis seletores do botão
+    const selectors = [
+        '.export-btn',
+        '#btn-export-pdf',
+        '[data-action="export-pdf"]',
+        'button[onclick*="PDF"]',
+        '.btn-export-pdf'
+    ];
+    
+    let exportBtn = null;
+    
+    for (const selector of selectors) {
+        exportBtn = document.querySelector(selector);
+        if (exportBtn) {
+            console.log(`✅ Botão encontrado com seletor: ${selector}`);
+            break;
+        }
+    }
+    
+    if (!exportBtn) {
+        console.warn('⚠️ Botão de export PDF não encontrado! Seletores tentados:', selectors);
+        return false;
+    }
+    
+    // Remove listeners antigos
+    const newBtn = exportBtn.cloneNode(true);
+    exportBtn.parentNode.replaceChild(newBtn, exportBtn);
+    exportBtn = newBtn;
+    
+    // Adiciona listener
+    exportBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('📄 Botão PDF clicado!');
+        PDFExportModule.generatePDF();
+    });
+    
+    console.log('✅ Event listener anexado ao botão PDF');
+    return true;
 }
 
-function showSuccessMessage(message) {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 100px;
-        right: 20px;
-        background: #10b981;
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 600;
-        z-index: 9999;
-        animation: slideInRight 0.3s ease-out;
-        box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
-    `;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease-out';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
+// Tenta anexar imediatamente
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', attachExportButton);
+} else {
+    attachExportButton();
 }
 
-console.log('✨ PDF Export module loaded (4 pages with 7 scenarios + custom material dropdown support)');
+// Tenta novamente após 2 segundos (caso o botão seja renderizado dinamicamente)
+setTimeout(attachExportButton, 2000);
+
+// Expor função globalmente para debug
+window.attachPDFExportButton = attachExportButton;

@@ -1,7 +1,7 @@
 /* ========================================
    BUILDING SUSTAINABILITY FRAMEWORK
    Charts Module - 7 Scenarios Visualization
-   VERSÃO CORRIGIDA PARA VERCEL
+   ✅ VERSÃO FINAL: 4 STEPS + LABELS CORRIGIDOS + RESPONSIVO
    ======================================== */
 
 const ChartsModule = (function() {
@@ -58,7 +58,7 @@ const ChartsModule = (function() {
     }
 
     /* ========================================
-       BAR CHART - 7 SCENARIOS COMPARISON
+       ✅ BAR CHART - 7 SCENARIOS (CORRIGIDO)
        ======================================== */
     function createBarChart() {
         const ctx = document.getElementById('barChart');
@@ -70,16 +70,31 @@ const ChartsModule = (function() {
 
         const scenarios = resultsData.allScenarios;
         
+        // ✅ Ordenar por total carbon (menor → maior)
         const sortedScenarios = scenarios.slice().sort((a, b) => 
             a.totalCarbon - b.totalCarbon
         );
 
-        const labels = sortedScenarios.map(s => s.displayName);
-        const embodiedData = sortedScenarios.map(s => s.embodiedCarbon);
-        const operationalData = sortedScenarios.map(s => s.operationalCarbon);
+        // ✅ LABELS EM 2 LINHAS para nomes longos
+        const labels = sortedScenarios.map(s => {
+            const name = s.displayName;
+            // Quebra labels com mais de 18 caracteres
+            if (name.length > 18) {
+                const words = name.split(' ');
+                const mid = Math.ceil(words.length / 2);
+                return [
+                    words.slice(0, mid).join(' '),
+                    words.slice(mid).join(' ')
+                ];
+            }
+            return name;
+        });
+
+        const embodiedData = sortedScenarios.map(s => s.embodiedCarbon / 1000000); // MJ → M MJ
+        const operationalData = sortedScenarios.map(s => s.operationalCarbon / 1000000);
         
         const colors = sortedScenarios.map(s => 
-            s.category === 'renovation' ? 'rgba(16, 185, 129, 0.8)' : 'rgba(14, 165, 233, 0.8)'
+            s.category === 'renovation' ? 'rgba(16, 185, 129, 0.85)' : 'rgba(14, 165, 233, 0.85)'
         );
         const borderColors = sortedScenarios.map(s => 
             s.category === 'renovation' ? '#10b981' : '#0ea5e9'
@@ -97,24 +112,27 @@ const ChartsModule = (function() {
                             backgroundColor: colors,
                             borderColor: borderColors,
                             borderWidth: 2,
-                            borderRadius: 8,
+                            borderRadius: 6,
+                            barThickness: 35 // ✅ REDUZIDO: 40 → 35
                         },
                         {
                             label: 'Operational Carbon',
                             data: operationalData,
-                            backgroundColor: colors.map(c => c.replace('0.8', '0.5')),
+                            backgroundColor: colors.map(c => c.replace('0.85', '0.55')),
                             borderColor: borderColors,
                             borderWidth: 2,
-                            borderRadius: 8,
+                            borderRadius: 6,
+                            barThickness: 35
                         }
                     ]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,  // ✅ CORRIGIDO
+                    maintainAspectRatio: true, // ✅ NOVO: Mantém proporção
+                    aspectRatio: 2.2, // ✅ NOVO: Mais largo (width/height = 2.2)
                     interaction: {
                         mode: 'index',
-                        intersect: false,
+                        intersect: false
                     },
                     plugins: {
                         title: {
@@ -131,7 +149,7 @@ const ChartsModule = (function() {
                                 font: { size: 13, weight: '600' },
                                 padding: 15,
                                 usePointStyle: true,
-                                pointStyle: 'rectRounded'
+                                pointStyle: 'circle' // ✅ Círculos em vez de quadrados
                             }
                         },
                         tooltip: {
@@ -142,13 +160,22 @@ const ChartsModule = (function() {
                             cornerRadius: 8,
                             displayColors: true,
                             callbacks: {
+                                title: function(context) {
+                                    const label = context[0].label;
+                                    // Se for array (2 linhas), junta com espaço
+                                    return Array.isArray(label) ? label.join(' ') : label;
+                                },
                                 label: function(context) {
-                                    return context.dataset.label + ': ' + 
-                                           context.parsed.y.toLocaleString() + ' tCO₂e';
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y.toFixed(2) + ' M MJ';
+                                    return label;
                                 },
                                 footer: function(tooltipItems) {
                                     const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0);
-                                    return 'Total: ' + total.toLocaleString() + ' tCO₂e';
+                                    return 'Total: ' + total.toFixed(2) + ' M MJ';
                                 }
                             }
                         }
@@ -158,10 +185,12 @@ const ChartsModule = (function() {
                             stacked: true,
                             grid: { display: false },
                             ticks: {
-                                font: { size: 10, weight: '600' },
+                                font: { size: 10, weight: '600' }, // ✅ REDUZIDO: 11 → 10
                                 color: '#374151',
-                                maxRotation: 45,
-                                minRotation: 0
+                                maxRotation: 45, // ✅ NOVO: Máximo 45° rotação
+                                minRotation: 0,  // ✅ NOVO: Sem rotação forçada
+                                autoSkip: false, // ✅ Mostra todos os labels
+                                padding: 8
                             }
                         },
                         y: {
@@ -175,21 +204,30 @@ const ChartsModule = (function() {
                                 font: { size: 12 },
                                 color: '#6b7280',
                                 callback: function(value) {
-                                    return value.toLocaleString() + ' tCO₂e';
+                                    return value.toFixed(1) + ' M MJ';
                                 }
                             },
                             title: {
                                 display: true,
-                                text: 'Total Carbon Emissions (tCO₂e)',
+                                text: 'Carbon Emissions (tCO₂e)', // ✅ Label do eixo Y
                                 font: { size: 13, weight: '600' },
-                                color: '#374151'
+                                color: '#374151',
+                                padding: { bottom: 10 }
                             }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 10,
+                            top: 10,
+                            bottom: 10
                         }
                     }
                 }
             });
             
-            console.log('✅ BAR CHART created');
+            console.log('✅ BAR CHART created with 7 scenarios');
             
         } catch (error) {
             console.error('❌ Error creating bar chart:', error);
@@ -245,7 +283,7 @@ const ChartsModule = (function() {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,  // ✅ CORRIGIDO
+                    maintainAspectRatio: false,
                     plugins: {
                         title: {
                             display: true,
@@ -354,10 +392,10 @@ const ChartsModule = (function() {
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,  // ✅ CORRIGIDO
+                    maintainAspectRatio: false,
                     interaction: {
                         mode: 'index',
-                        intersect: false,
+                        intersect: false
                     },
                     plugins: {
                         title: {
@@ -533,4 +571,4 @@ const ChartsModule = (function() {
 // Expose to global scope
 window.ChartsModule = ChartsModule;
 
-console.log('✨ Charts module loaded (7 scenarios, Vercel-optimized)');
+console.log('✨ Charts module loaded (7 scenarios, 4-step flow, labels optimized)');
